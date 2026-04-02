@@ -2,18 +2,19 @@
 import { db } from "./firebase-config.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// Seleccionamos el contenedor donde van a ir las cards de servicios
+// Seleccionamos el contenedor donde se mostrarán las cards
 const container = document.querySelector(".services-container");
 
 async function loadServices() {
   try {
     const querySnapshot = await getDocs(collection(db, "services"));
 
-    // Limpiamos el contenedor antes de agregar servicios
+    // Limpiamos el contenedor antes de agregar los servicios
     container.innerHTML = "";
 
     querySnapshot.forEach((doc) => {
       const data = doc.data();
+
       const card = `
         <div class="card">
           <img src="${data.image}" alt="${data.name}">
@@ -23,13 +24,18 @@ async function loadServices() {
           <button>Reservar</button>
         </div>
       `;
+
       container.innerHTML += card;
     });
   } catch (error) {
     console.error("Error cargando servicios:", error);
-    container.innerHTML = "<p>Error cargando los servicios. Intenta de nuevo.</p>";
+    container.innerHTML = "<p>Error cargando los servicios. Intenta de nuevo más tarde.</p>";
   }
 }
+
+// Ejecutamos la función al cargar la página
+loadServices();
+</script>
 
 // Ejecutamos la función al cargar la página
 loadServices();
