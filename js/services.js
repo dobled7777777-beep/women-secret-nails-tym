@@ -1,42 +1,79 @@
 <script type="module">
 import { db } from "./firebase-config.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// Seleccionamos el contenedor donde se mostrarán las cards
 const container = document.querySelector(".services-container");
+const modal = document.getElementById("reservation-modal");
+const closeModal = document.getElementById("close-modal");
+const selectedServiceEl = document.getElementById("selected-service");
+const confirmButton = document.getElementById("confirm-reservation");
+const dateInput = document.getElementById("reservation-date");
+const timeInput = document.getElementById("reservation-time");
 
 async function loadServices() {
   try {
     const querySnapshot = await getDocs(collection(db, "services"));
-
-    // Limpiamos el contenedor antes de agregar los servicios
     container.innerHTML = "";
 
     querySnapshot.forEach((doc) => {
       const data = doc.data();
+      const card = document.createElement("div");
+      card.className = "card";
 
-      const card = `
-        <div class="card">
-          <img src="${data.image}" alt="${data.name}">
-          <h3>${data.name}</h3>
-          <p>$${data.price}</p>
-          <p>${data.duration} min</p>
-          <button>Reservar</button>
-        </div>
+      card.innerHTML = `
+        <img src="${data.image}" alt="${data.name}">
+        <h3>${data.name}</h3>
+        <p>$${data.price}</p>
+        <p>${data.duration} min</p>
+        <button class="reserve-btn">Reservar</button>
       `;
 
-      container.innerHTML += card;
+      container.appendChild(card);
+
+      // Evento click en "Reservar"
+      card.querySelector(".reserve-btn").addEventListener("click", () => {
+        selectedServiceEl.textContent = `Servicio: ${data.name}`;
+        dateInput.value = "";
+        timeInput.value = "";
+        modal.style.display = "flex";
+      });
     });
   } catch (error) {
     console.error("Error cargando servicios:", error);
-    container.innerHTML = "<p>Error cargando los servicios. Intenta de nuevo más tarde.</p>";
+    container.innerHTML = "<p>Error cargando los servicios. Intenta de nuevo.</p>";
   }
 }
 
-// Ejecutamos la función al cargar la página
-loadServices();
-</script>
+// Cerrar modal
+closeModal.addEventListener("click", () => {
+  modal.style.display = "none";
+});
 
-// Ejecutamos la función al cargar la página
+// Confirmar reserva
+confirmButton.addEventListener("click", async () => {
+  const date = dateInput.value;
+  const time = timeInput.value;
+  const serviceName = selectedServiceEl.textContent.replace("Servicio: ", "");
+
+  if (!date || !time) {
+    alert("Por favor selecciona fecha y hora.");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "reservations"), {
+      service: serviceName,
+      date,
+      time,
+      createdAt: new Date()
+    });
+    alert("Reserva confirmada!");
+    modal.style.display = "none";
+  } catch (error) {
+    console.error("Error guardando reserva:", error);
+    alert("Error al guardar la reserva.");
+  }
+});
+
 loadServices();
 </script>
