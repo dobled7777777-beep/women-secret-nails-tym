@@ -13,13 +13,22 @@
 
 <div class="services-container"></div>
 
-<!-- Importamos el JS de servicios dinámicos -->
-<script type="module" src="js/services.js"></script>
-
-</body>
-</html>
-
+<!-- Modal de reserva -->
+<div id="reservation-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span id="close-modal" style="cursor:pointer;">&times;</span>
+    <h2>Reservar Servicio</h2>
+    <p id="selected-service"></p>
+    <label for="date">Selecciona la fecha:</label>
+    <input type="date" id="reservation-date">
+    <label for="time">Selecciona la hora:</label>
+    <input type="time" id="reservation-time">
+    <button id="confirm-reservation">Confirmar</button>
+  </div>
 </div>
+
+<!-- Importamos JS de servicios -->
+<script type="module" src="js/services.js"></script>
 
 </body>
 </html>
