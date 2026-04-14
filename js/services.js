@@ -26,10 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
-          <img src="${data.image}" alt="${data.name}">
-          <h3>${data.name}</h3>
-          <p>$${data.price}</p>
-          <p>${data.duration} min</p>
+          <img src="${data.image || 'https://via.placeholder.com/150'}" alt="${data.name || 'Servicio'}">
+          <h3>${data.name || 'Servicio no definido'}</h3>
+          <p>$${data.price || 'Consultar'}</p>
+          <p>${data.duration || 'Duración no definida'} min</p>
           <button class="reserve-btn">Reservar</button>
         `;
         container.appendChild(card);
