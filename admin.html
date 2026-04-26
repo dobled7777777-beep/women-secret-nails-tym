@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin · Women Secret Nails</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── Admin-only styles ── */
+    .admin-wrap {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 clamp(16px,4vw,40px) 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Login */
+    .login-box {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 40px 36px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(212,184,150,0.2);
+      text-align: center;
+      margin-top: 40px;
+    }
+    .login-box h2 {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 400;
+      margin-bottom: 8px;
+      color: var(--text-dark);
+    }
+    .login-box p {
+      font-size: 14px;
+      color: var(--text-light);
+      margin-bottom: 28px;
+      font-weight: 300;
+    }
+    .login-input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1px solid rgba(212,184,150,0.4);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 15px;
+      background: var(--nude-pale);
+      color: var(--text-dark);
+      outline: none;
+      margin-bottom: 14px;
+      transition: border-color 0.2s;
+    }
+    .login-input:focus { border-color: var(--rose); }
+    .login-error {
+      font-size: 13px;
+      color: var(--rose-deep);
+      margin-bottom: 12px;
+      min-height: 20px;
+    }
+
+    /* Tabs de estado */
+    .admin-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 8px 18px;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(212,184,150,0.3);
+      background: white;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--rose-deep);
+      border-color: var(--rose-deep);
+      color: white;
+    }
+    .tab-btn .count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      font-size: 10px;
+      margin-left: 6px;
+    }
+    .tab-btn:not(.active) .count {
+      background: var(--rose-pale);
+      color: var(--rose-deep);
+    }
+
+    /* Cards de reserva */
+    .reservation-card {
+      background: white;
+      border-radius: var(--radius-md);
+      padding: 20px 22px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(212,184,150,0.15);
+      animation: fadeUp 0.3s forwards;
+      opacity: 0;
+    }
+    .res-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .res-service {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--text-dark);
+      line-height: 1.1;
+    }
+    .res-badge {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: var(--radius-xl);
+    }
+    .badge-pendiente  { background: var(--gold-pale);  color: var(--nude-deep); }
+    .badge-confirmada { background: #e8f5e9;            color: #388e3c; }
+    .badge-cancelada  { background: var(--rose-pale);   color: var(--rose-deep); }
+
+    .res-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 16px;
+      margin-bottom: 18px;
+    }
+    .res-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .res-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      font-weight: 400;
+    }
+    .res-value {
+      font-size: 14px;
+      color: var(--text-dark);
+      font-weight: 400;
+    }
+
+    .res-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-confirm {
+      flex: 1;
+      padding: 10px;
+      background: #e8f5e9;
+      color: #388e3c;
+      border: 1px solid #a5d6a7;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-confirm:hover { background: #c8e6c9; }
+
+    .btn-cancel {
+      flex: 1;
+      padding: 10px;
+      background: var(--rose-pale);
+      color: var(--rose-deep);
+      border: 1px solid rgba(201,123,138,0.3);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-cancel:hover { background: var(--rose-soft); }
+
+    .admin-empty {
+      text-align: center;
+      padding: 60px 0;
+      color: var(--text-light);
+      font-size: 14px;
+      font-weight: 300;
+    }
+    .admin-empty span { font-size: 36px; display: block; margin-bottom: 12px; }
+
+    .admin-loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-light);
+    }
+
+    /* Fecha en el header de admin */
+    .admin-date-filter {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .admin-date-filter label {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      white-space: nowrap;
+    }
+    .admin-date-filter input {
+      padding: 8px 14px;
+      border: 1px solid rgba(212,184,150,0.35);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 13px;
+      background: var(--nude-pale);
+      color: var(--text-dark);
+      outline: none;
+    }
+  </style>
+</head>
+<body class="services-page">
+
+  <div class="bg-orb bg-orb--1"></div>
+  <div class="bg-orb bg-orb--2"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo-mark">WSN</a>
+      <nav class="header-nav">
+        <a href="index.html">Inicio</a>
+        <a href="services.html">Servicios</a>
+        <span class="nav-current">Admin</span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="admin-wrap">
+
+    <!-- Título -->
+    <div class="page-title" style="padding-left:0;padding-right:0;text-align:left;">
+      <p class="page-eyebrow">Panel de administración</p>
+      <h1 class="page-heading" style="font-size:clamp(32px,5vw,52px);">
+        Mis <em>reservas</em>
+      </h1>
+    </div>
+
+    <!-- LOGIN BOX -->
+    <div class="login-box" id="login-box">
+      <h2>Acceso privado 🔐</h2>
+      <p>Ingresa la contraseña del panel de administración</p>
+      <input type="password" class="login-input" id="admin-password" placeholder="Contraseña" autocomplete="current-password">
+      <p class="login-error" id="login-error"></p>
+      <button class="btn-primary btn-full" id="login-btn" style="margin-top:0;">Entrar</button>
+    </div>
+
+    <!-- PANEL (oculto hasta login) -->
+    <div id="admin-panel" style="display:none;">
+
+      <!-- Filtro de fecha -->
+      <div class="admin-date-filter">
+        <label for="filter-date">Ver reservas del día:</label>
+        <input type="date" id="filter-date">
+        <button class="btn-ghost" id="show-all-btn" style="padding:8px 16px;font-size:12px;">Ver todas</button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="admin-tabs">
+        <button class="tab-btn active" data-filter="pendiente">
+          Pendientes <span class="count" id="count-pendiente">0</span>
+        </button>
+        <button class="tab-btn" data-filter="confirmada">
+          Confirmadas <span class="count" id="count-confirmada">0</span>
+        </button>
+        <button class="tab-btn" data-filter="cancelada">
+          Canceladas <span class="count" id="count-cancelada">0</span>
+        </button>
+      </div>
+
+      <!-- Lista de reservas -->
+      <div id="reservations-list">
+        <div class="admin-loading">
+          <div class="loading-spinner" style="margin:0 auto 12px;"></div>
+          Cargando reservas...
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from "./js/firebase-config.js";
+    import {
+      collection, getDocs, doc, updateDoc,
+      query, where, orderBy
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    // ── Contraseña simple (puedes cambiarla) ──────────────────────────────────
+    // En Fase 3 esto se reemplaza por Firebase Auth real
+    const ADMIN_PASSWORD = "wsn2026";
+
+    const loginBox   = document.getElementById("login-box");
+    const adminPanel = document.getElementById("admin-panel");
+    const loginBtn   = document.getElementById("login-btn");
+    const pwInput    = document.getElementById("admin-password");
+    const loginError = document.getElementById("login-error");
+    const filterDate = document.getElementById("filter-date");
+    const showAllBtn = document.getElementById("show-all-btn");
+    const listEl     = document.getElementById("reservations-list");
+
+    let allReservations = [];
+    let currentFilter   = "pendiente";
+    let dateFilter      = null;
+
+    // Fecha de hoy por defecto
+    const now = new Date();
+    filterDate.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+    dateFilter = filterDate.value;
+
+    // ── Login ─────────────────────────────────────────────────────────────────
+    loginBtn.addEventListener("click", checkLogin);
+    pwInput.addEventListener("keydown", e => { if (e.key === "Enter") checkLogin(); });
+
+    function checkLogin() {
+      if (pwInput.value === ADMIN_PASSWORD) {
+        loginBox.style.display   = "none";
+        adminPanel.style.display = "block";
+        loadReservations();
+      } else {
+        loginError.textContent = "Contraseña incorrecta. Intenta de nuevo.";
+        pwInput.value = "";
+        pwInput.focus();
+      }
+    }
+
+    // ── Cargar reservas ───────────────────────────────────────────────────────
+    async function loadReservations() {
+      listEl.innerHTML = `<div class="admin-loading"><div class="loading-spinner" style="margin:0 auto 12px;"></div>Cargando...</div>`;
+      try {
+        const snap = await getDocs(
+          query(collection(db, "reservations"), orderBy("date","asc"), orderBy("time","asc"))
+        );
+        allReservations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        updateCounts();
+        renderList();
+      } catch (err) {
+        console.error(err);
+        listEl.innerHTML = `<p style="text-align:center;color:var(--rose-deep);padding:40px;">Error cargando reservas.</p>`;
+      }
+    }
+
+    // ── Contar por estado ─────────────────────────────────────────────────────
+    function updateCounts() {
+      ["pendiente","confirmada","cancelada"].forEach(status => {
+        const filtered = dateFilter
+          ? allReservations.filter(r => r.status === status && r.date === dateFilter)
+          : allReservations.filter(r => r.status === status);
+        document.getElementById(`count-${status}`).textContent = filtered.length;
+      });
+    }
+
+    // ── Renderizar lista ──────────────────────────────────────────────────────
+    function renderList() {
+      const filtered = allReservations.filter(r =>
+        r.status === currentFilter &&
+        (!dateFilter || r.date === dateFilter)
+      );
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `
+          <div class="admin-empty">
+            <span>${currentFilter === "pendiente" ? "🎉" : currentFilter === "confirmada" ? "📅" : "🚫"}</span>
+            No hay reservas ${currentFilter === "pendiente" ? "pendientes" : currentFilter === "confirmada" ? "confirmadas" : "canceladas"}
+            ${dateFilter ? "para este día." : "aún."}
+          </div>`;
+        return;
+      }
+
+      listEl.innerHTML = "";
+      filtered.forEach((res, i) => {
+        const card = document.createElement("div");
+        card.className = "reservation-card";
+        card.style.animationDelay = `${i * 0.05}s`;
+
+        const [y,m,d] = (res.date || "").split("-");
+        const months = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+        const dateStr = res.date ? `${parseInt(d)} ${months[parseInt(m)-1]} ${y}` : "—";
+        const [hh,mm] = (res.time || "").split(":");
+        const h = parseInt(hh);
+        const timeStr = res.time
+          ? `${h%12||12}:${mm} ${h>=12?"pm":"am"}`
+          : "—";
+        const payIcon = res.payment === "efectivo" ? "💵" : "💳";
+        const payStr  = res.payment === "efectivo" ? "Efectivo" : "Virtual";
+
+        card.innerHTML = `
+          <div class="res-header">
+            <div>
+              <p class="res-service">${res.service || "Servicio"}</p>
+            </div>
+            <span class="res-badge badge-${res.status}">${res.status}</span>
+          </div>
+          <div class="res-details">
+            <div class="res-detail">
+              <span class="res-label">Fecha</span>
+              <span class="res-value">📅 ${dateStr}</span>
+            </div>
+            <div class="res-detail">
+              <span class="res-label">Hora</span>
+              <span class="res-value">🕐 ${timeStr}</span>
+            </div>
+            <div class="res-detail">
+              <span class="res-label">Duración</span>
+              <span class="res-value">⏱ ${res.duration || "—"} min</span>
+            </div>
+            <div class="res-detail">
+              <span class="res-label">Pago</span>
+              <span class="res-value">${payIcon} ${payStr}</span>
+            </div>
+          </div>
+          ${res.status === "pendiente" ? `
+          <div class="res-actions">
+            <button class="btn-confirm" data-id="${res.id}">✓ Confirmar</button>
+            <button class="btn-cancel"  data-id="${res.id}">✕ Cancelar</button>
+          </div>` : ""}
+        `;
+
+        listEl.appendChild(card);
+      });
+
+      // Eventos confirmar / cancelar
+      listEl.querySelectorAll(".btn-confirm").forEach(btn => {
+        btn.addEventListener("click", () => updateStatus(btn.dataset.id, "confirmada", btn));
+      });
+      listEl.querySelectorAll(".btn-cancel").forEach(btn => {
+        btn.addEventListener("click", () => updateStatus(btn.dataset.id, "cancelada", btn));
+      });
+    }
+
+    // ── Actualizar estado ─────────────────────────────────────────────────────
+    async function updateStatus(id, status, btn) {
+      const actions = btn.closest(".res-actions");
+      actions.innerHTML = `<p style="font-size:13px;color:var(--text-light);padding:6px 0;">Guardando...</p>`;
+      try {
+        await updateDoc(doc(db, "reservations", id), { status });
+        const idx = allReservations.findIndex(r => r.id === id);
+        if (idx > -1) allReservations[idx].status = status;
+        updateCounts();
+        renderList();
+      } catch (err) {
+        console.error(err);
+        actions.innerHTML = `<p style="font-size:13px;color:var(--rose-deep);">Error. Intenta de nuevo.</p>`;
+      }
+    }
+
+    // ── Tabs ──────────────────────────────────────────────────────────────────
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.dataset.filter;
+        renderList();
+      });
+    });
+
+    // ── Filtro de fecha ───────────────────────────────────────────────────────
+    filterDate.addEventListener("change", () => {
+      dateFilter = filterDate.value || null;
+      updateCounts();
+      renderList();
+    });
+
+    showAllBtn.addEventListener("click", () => {
+      filterDate.value = "";
+      dateFilter = null;
+      updateCounts();
+      renderList();
+    });
+  </script>
+</body>
+</html>
