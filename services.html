@@ -11,11 +11,9 @@
 </head>
 <body class="services-page">
 
-  <!-- Fondos decorativos -->
   <div class="bg-orb bg-orb--1"></div>
   <div class="bg-orb bg-orb--2"></div>
 
-  <!-- Header -->
   <header class="site-header">
     <div class="header-inner">
       <a href="index.html" class="logo-mark">WSN</a>
@@ -26,47 +24,46 @@
     </div>
   </header>
 
-  <!-- Título de sección -->
   <div class="page-title">
     <p class="page-eyebrow">Nuestros servicios</p>
     <h1 class="page-heading">Elige tu <em>experiencia</em></h1>
-    <p class="page-desc">Selecciona el servicio que quieres y agenda tu cita al instante.</p>
+    <p class="page-desc">Selecciona el servicio y agenda tu cita al instante.</p>
   </div>
 
-  <!-- Grid de servicios -->
   <main class="services-container" id="services-grid">
-    <!-- Las cards se generan dinámicamente desde Firebase -->
     <div class="loading-state">
       <div class="loading-spinner"></div>
       <p>Cargando servicios...</p>
     </div>
   </main>
 
-  <!-- ======= MODAL DE RESERVA ======= -->
+  <!-- ══════════════ MODAL DE RESERVA ══════════════ -->
   <div id="reservation-modal" class="modal" style="display:none;" role="dialog" aria-modal="true">
     <div class="modal-backdrop" id="modal-backdrop"></div>
     <div class="modal-content">
 
-      <!-- Cabecera del modal -->
+      <!-- Cabecera -->
       <div class="modal-header">
         <div>
           <p class="modal-eyebrow">Reservar</p>
           <h2 class="modal-title" id="modal-service-name">Servicio</h2>
-          <p class="modal-meta" id="modal-service-meta"></p>
+          <p class="modal-meta"  id="modal-service-meta"></p>
         </div>
         <button id="close-modal" class="modal-close" aria-label="Cerrar">&times;</button>
       </div>
 
-      <!-- Pasos del modal -->
+      <!-- Indicador de 4 pasos -->
       <div class="modal-steps">
         <div class="step active" id="step-dot-1"></div>
         <div class="step-line"></div>
         <div class="step" id="step-dot-2"></div>
         <div class="step-line"></div>
         <div class="step" id="step-dot-3"></div>
+        <div class="step-line"></div>
+        <div class="step" id="step-dot-4"></div>
       </div>
 
-      <!-- Paso 1: Fecha y hora -->
+      <!-- ── Paso 1: Fecha y hora ── -->
       <div class="modal-step" id="step-1">
         <h3 class="step-title">¿Cuándo quieres venir?</h3>
         <div class="form-group">
@@ -74,41 +71,19 @@
           <input type="date" id="reservation-date" class="form-input">
         </div>
         <div class="form-group">
-          <label class="form-label">Hora</label>
+          <label class="form-label">Hora disponible</label>
           <div class="time-slots" id="time-slots">
-            <button class="time-slot" data-time="09:00">9:00 am</button>
-            <button class="time-slot" data-time="10:00">10:00 am</button>
-            <button class="time-slot" data-time="11:00">11:00 am</button>
-            <button class="time-slot" data-time="12:00">12:00 pm</button>
-            <button class="time-slot" data-time="14:00">2:00 pm</button>
-            <button class="time-slot" data-time="15:00">3:00 pm</button>
-            <button class="time-slot" data-time="16:00">4:00 pm</button>
-            <button class="time-slot" data-time="17:00">5:00 pm</button>
+            <p class="slots-hint">Selecciona una fecha para ver los horarios.</p>
           </div>
         </div>
         <button class="btn-primary btn-full" id="next-step-2">Continuar →</button>
       </div>
 
-      <!-- Paso 2: Método de pago -->
+      <!-- ── Paso 2: Especialista ── -->
       <div class="modal-step hidden" id="step-2">
-        <h3 class="step-title">¿Cómo prefieres pagar?</h3>
-        <div class="payment-options">
-          <label class="payment-option" id="pay-cash-label">
-            <input type="radio" name="payment" value="efectivo" id="pay-cash">
-            <div class="payment-card">
-              <span class="payment-icon">💵</span>
-              <span class="payment-name">Efectivo</span>
-              <span class="payment-desc">Pagas el día de tu cita</span>
-            </div>
-          </label>
-          <label class="payment-option" id="pay-virtual-label">
-            <input type="radio" name="payment" value="virtual" id="pay-virtual">
-            <div class="payment-card">
-              <span class="payment-icon">💳</span>
-              <span class="payment-name">Virtual</span>
-              <span class="payment-desc">Transferencia o Nequi</span>
-            </div>
-          </label>
+        <h3 class="step-title">¿Con quién quieres tu cita?</h3>
+        <div class="staff-list" id="staff-list">
+          <!-- Se llena dinámicamente desde Firebase -->
         </div>
         <div class="step-nav">
           <button class="btn-ghost" id="back-step-1">← Volver</button>
@@ -116,13 +91,44 @@
         </div>
       </div>
 
-      <!-- Paso 3: Confirmar -->
+      <!-- ── Paso 3: Método de pago ── -->
       <div class="modal-step hidden" id="step-3">
+        <h3 class="step-title">¿Cómo prefieres pagar?</h3>
+        <div class="payment-options">
+          <label class="payment-option">
+            <input type="radio" name="payment" value="efectivo">
+            <div class="payment-card">
+              <span class="payment-icon">💵</span>
+              <span class="payment-name">Efectivo</span>
+              <span class="payment-desc">Pagas el día de tu cita</span>
+            </div>
+          </label>
+          <label class="payment-option">
+            <input type="radio" name="payment" value="virtual">
+            <div class="payment-card">
+              <span class="payment-icon">💳</span>
+              <span class="payment-name">Virtual</span>
+              <span class="payment-desc">Nequi o Transferencia</span>
+            </div>
+          </label>
+        </div>
+        <div class="step-nav">
+          <button class="btn-ghost" id="back-step-2">← Volver</button>
+          <button class="btn-primary" id="next-step-4">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- ── Paso 4: Confirmar ── -->
+      <div class="modal-step hidden" id="step-4">
         <h3 class="step-title">Confirma tu cita</h3>
         <div class="summary-card">
           <div class="summary-row">
             <span class="summary-label">Servicio</span>
             <span class="summary-value" id="summary-service">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Especialista</span>
+            <span class="summary-value" id="summary-specialist">—</span>
           </div>
           <div class="summary-row">
             <span class="summary-label">Fecha</span>
@@ -141,18 +147,25 @@
             <span class="summary-value" id="summary-price">—</span>
           </div>
         </div>
+        <p style="font-size:12px;color:var(--text-light);margin-bottom:16px;text-align:center;line-height:1.6;">
+          Tu reserva quedará <strong>pendiente de confirmación</strong>.<br>
+          La administradora te confirmará tu cita pronto 💅
+        </p>
         <div class="step-nav">
-          <button class="btn-ghost" id="back-step-2">← Volver</button>
+          <button class="btn-ghost" id="back-step-3">← Volver</button>
           <button class="btn-primary" id="confirm-reservation">Confirmar cita ✓</button>
         </div>
       </div>
 
-      <!-- Estado de éxito -->
+      <!-- ── Éxito ── -->
       <div class="modal-step hidden" id="step-success">
         <div class="success-state">
           <div class="success-icon">✓</div>
           <h3 class="success-title">¡Cita agendada!</h3>
-          <p class="success-desc">Te esperamos con mucho cariño 💅</p>
+          <p class="success-desc">
+            Tu solicitud fue enviada.<br>
+            La administradora la confirmará pronto 💅
+          </p>
           <button class="btn-primary" id="close-success">Listo</button>
         </div>
       </div>
