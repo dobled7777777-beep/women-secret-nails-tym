@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/fireba
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSy...",
+  apiKey: "AIzaSyDFsFLw518RovvIPGcIzFDrih4oKBKgz-o",
   authDomain: "women-secret-nails.firebaseapp.com",
   projectId: "women-secret-nails",
   storageBucket: "women-secret-nails.firebasestorage.app",
