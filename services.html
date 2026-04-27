@@ -37,12 +37,11 @@
     </div>
   </main>
 
-  <!-- ══════════════ MODAL DE RESERVA ══════════════ -->
+  <!-- ══════════════ MODAL ══════════════ -->
   <div id="reservation-modal" class="modal" style="display:none;" role="dialog" aria-modal="true">
     <div class="modal-backdrop" id="modal-backdrop"></div>
     <div class="modal-content">
 
-      <!-- Cabecera -->
       <div class="modal-header">
         <div>
           <p class="modal-eyebrow">Reservar</p>
@@ -52,7 +51,7 @@
         <button id="close-modal" class="modal-close" aria-label="Cerrar">&times;</button>
       </div>
 
-      <!-- Indicador de 4 pasos -->
+      <!-- 5 pasos -->
       <div class="modal-steps">
         <div class="step active" id="step-dot-1"></div>
         <div class="step-line"></div>
@@ -61,9 +60,11 @@
         <div class="step" id="step-dot-3"></div>
         <div class="step-line"></div>
         <div class="step" id="step-dot-4"></div>
+        <div class="step-line"></div>
+        <div class="step" id="step-dot-5"></div>
       </div>
 
-      <!-- ── Paso 1: Fecha y hora ── -->
+      <!-- Paso 1: Fecha y hora -->
       <div class="modal-step" id="step-1">
         <h3 class="step-title">¿Cuándo quieres venir?</h3>
         <div class="form-group">
@@ -79,20 +80,35 @@
         <button class="btn-primary btn-full" id="next-step-2">Continuar →</button>
       </div>
 
-      <!-- ── Paso 2: Especialista ── -->
+      <!-- Paso 2: Especialista -->
       <div class="modal-step hidden" id="step-2">
         <h3 class="step-title">¿Con quién quieres tu cita?</h3>
-        <div class="staff-list" id="staff-list">
-          <!-- Se llena dinámicamente desde Firebase -->
-        </div>
+        <div class="staff-list" id="staff-list"></div>
         <div class="step-nav">
           <button class="btn-ghost" id="back-step-1">← Volver</button>
           <button class="btn-primary" id="next-step-3">Continuar →</button>
         </div>
       </div>
 
-      <!-- ── Paso 3: Método de pago ── -->
+      <!-- Paso 3: Datos del cliente -->
       <div class="modal-step hidden" id="step-3">
+        <h3 class="step-title">¿Cómo te llamamos?</h3>
+        <div class="form-group">
+          <label class="form-label" for="client-name">Tu nombre</label>
+          <input type="text" id="client-name" class="form-input" placeholder="Ej: María García">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="client-phone">Tu teléfono / WhatsApp</label>
+          <input type="tel" id="client-phone" class="form-input" placeholder="Ej: 300 123 4567">
+        </div>
+        <div class="step-nav">
+          <button class="btn-ghost" id="back-step-2">← Volver</button>
+          <button class="btn-primary" id="next-step-4">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Paso 4: Método de pago -->
+      <div class="modal-step hidden" id="step-4">
         <h3 class="step-title">¿Cómo prefieres pagar?</h3>
         <div class="payment-options">
           <label class="payment-option">
@@ -113,13 +129,13 @@
           </label>
         </div>
         <div class="step-nav">
-          <button class="btn-ghost" id="back-step-2">← Volver</button>
-          <button class="btn-primary" id="next-step-4">Continuar →</button>
+          <button class="btn-ghost" id="back-step-3">← Volver</button>
+          <button class="btn-primary" id="next-step-5">Continuar →</button>
         </div>
       </div>
 
-      <!-- ── Paso 4: Confirmar ── -->
-      <div class="modal-step hidden" id="step-4">
+      <!-- Paso 5: Confirmar -->
+      <div class="modal-step hidden" id="step-5">
         <h3 class="step-title">Confirma tu cita</h3>
         <div class="summary-card">
           <div class="summary-row">
@@ -139,6 +155,10 @@
             <span class="summary-value" id="summary-time">—</span>
           </div>
           <div class="summary-row">
+            <span class="summary-label">Cliente</span>
+            <span class="summary-value" id="summary-client">—</span>
+          </div>
+          <div class="summary-row">
             <span class="summary-label">Pago</span>
             <span class="summary-value" id="summary-payment">—</span>
           </div>
@@ -149,22 +169,22 @@
         </div>
         <p style="font-size:12px;color:var(--text-light);margin-bottom:16px;text-align:center;line-height:1.6;">
           Tu reserva quedará <strong>pendiente de confirmación</strong>.<br>
-          La administradora te confirmará tu cita pronto 💅
+          La administradora te contactará para confirmar 💅
         </p>
         <div class="step-nav">
-          <button class="btn-ghost" id="back-step-3">← Volver</button>
+          <button class="btn-ghost" id="back-step-4">← Volver</button>
           <button class="btn-primary" id="confirm-reservation">Confirmar cita ✓</button>
         </div>
       </div>
 
-      <!-- ── Éxito ── -->
+      <!-- Éxito -->
       <div class="modal-step hidden" id="step-success">
         <div class="success-state">
           <div class="success-icon">✓</div>
           <h3 class="success-title">¡Cita agendada!</h3>
           <p class="success-desc">
             Tu solicitud fue enviada.<br>
-            La administradora la confirmará pronto 💅
+            Te contactaremos para confirmar 💅
           </p>
           <button class="btn-primary" id="close-success">Listo</button>
         </div>
