@@ -90,9 +90,7 @@
       display: flex; justify-content: space-between;
       align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
     }
-    .admin-user {
-      display: flex; align-items: center; gap: 10px;
-    }
+    .admin-user { display: flex; align-items: center; gap: 10px; }
     .admin-avatar {
       width: 38px; height: 38px; border-radius: 50%;
       background: var(--rose-pale);
@@ -112,6 +110,7 @@
       transition: color var(--transition), border-color var(--transition);
     }
     .btn-signout:hover { color: var(--rose-deep); border-color: var(--rose); }
+
     /* Tabs */
     .admin-tabs {
       display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
@@ -133,6 +132,7 @@
       background: rgba(255,255,255,0.25); font-size: 10px; padding: 0 4px;
     }
     .tab-btn:not(.active) .tab-count { background: var(--rose-pale); color: var(--rose-deep); }
+
     /* Filtro */
     .filter-row {
       display: flex; align-items: center; gap: 12px;
@@ -147,6 +147,7 @@
       font-family: var(--font-body); font-size: 13px;
       background: var(--nude-pale); color: var(--text-dark); outline: none;
     }
+
     /* Reservation cards */
     .reservation-card {
       background: white; border-radius: var(--radius-md);
@@ -163,15 +164,21 @@
       font-family: var(--font-display); font-size: 22px;
       font-weight: 400; color: var(--text-dark); line-height: 1.1;
     }
-    .res-specialist { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+    .res-client {
+      font-size: 13px; color: var(--text-mid);
+      margin-top: 3px; font-weight: 400;
+    }
+    .res-specialist { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+
     .status-badge {
       font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
       text-transform: uppercase; padding: 5px 12px;
-      border-radius: var(--radius-xl); white-space: nowrap;
+      border-radius: var(--radius-xl); white-space: nowrap; cursor: default;
     }
     .badge-pendiente  { background: var(--gold-pale);  color: var(--nude-deep); }
     .badge-confirmada { background: #e8f5e9;            color: #388e3c; }
     .badge-cancelada  { background: var(--rose-pale);   color: var(--rose-deep); }
+
     .res-grid {
       display: grid; grid-template-columns: repeat(2,1fr);
       gap: 10px 20px; margin-bottom: 18px;
@@ -182,23 +189,28 @@
       text-transform: uppercase; color: var(--text-light);
     }
     .res-item-value { font-size: 14px; color: var(--text-dark); }
-    .res-actions { display: flex; gap: 10px; }
-    .btn-confirm-res {
-      flex: 1; padding: 10px; background: #e8f5e9; color: #388e3c;
-      border: 1px solid #a5d6a7; border-radius: var(--radius-sm);
-      font-family: var(--font-body); font-size: 12px; font-weight: 500;
-      letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
-      transition: background 0.2s;
+
+    /* ── Acciones flexibles ── */
+    .res-actions {
+      display: flex; gap: 8px; flex-wrap: wrap;
     }
-    .btn-confirm-res:hover { background: #c8e6c9; }
-    .btn-cancel-res {
-      flex: 1; padding: 10px; background: var(--rose-pale); color: var(--rose-deep);
-      border: 1px solid rgba(201,123,138,0.3); border-radius: var(--radius-sm);
-      font-family: var(--font-body); font-size: 12px; font-weight: 500;
-      letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
-      transition: background 0.2s;
+    .action-btn {
+      flex: 1; min-width: 100px;
+      padding: 9px 8px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body); font-size: 11px; font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      cursor: pointer; border: 1px solid transparent;
+      transition: all 0.2s;
     }
-    .btn-cancel-res:hover { background: var(--rose-soft); }
+    .action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-confirmar  { background: #e8f5e9; color: #388e3c; border-color: #a5d6a7; }
+    .btn-confirmar:hover:not(:disabled)  { background: #c8e6c9; }
+    .btn-cancelar   { background: var(--rose-pale); color: var(--rose-deep); border-color: rgba(201,123,138,0.3); }
+    .btn-cancelar:hover:not(:disabled)   { background: var(--rose-soft); }
+    .btn-pendiente  { background: var(--gold-pale); color: var(--nude-deep); border-color: rgba(212,184,150,0.4); }
+    .btn-pendiente:hover:not(:disabled)  { background: #ede0c4; }
+
     .admin-empty {
       text-align: center; padding: 60px 20px; color: var(--text-light);
     }
@@ -207,6 +219,14 @@
     .admin-loading {
       text-align: center; padding: 50px; color: var(--text-light); font-size: 14px;
     }
+
+    /* Teléfono clickeable */
+    .phone-link {
+      color: var(--rose-deep);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .phone-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body class="services-page">
@@ -253,6 +273,7 @@
       <p class="page-eyebrow">Panel de administración</p>
       <h1 class="page-heading" style="font-size:clamp(32px,5vw,52px);">Mis <em>reservas</em></h1>
     </div>
+
     <div class="admin-topbar">
       <div class="admin-user">
         <div class="admin-avatar" id="admin-avatar">💅</div>
@@ -260,23 +281,30 @@
       </div>
       <button class="btn-signout" id="btn-signout">Cerrar sesión</button>
     </div>
+
     <div class="filter-row">
       <span class="filter-label">Día:</span>
       <input type="date" class="filter-date" id="filter-date">
       <button class="btn-ghost" id="btn-show-all" style="padding:8px 16px;font-size:12px;">Ver todas</button>
     </div>
+
     <div class="admin-tabs">
       <button class="tab-btn active" data-status="pendiente">Pendientes <span class="tab-count" id="cnt-pendiente">0</span></button>
       <button class="tab-btn" data-status="confirmada">Confirmadas <span class="tab-count" id="cnt-confirmada">0</span></button>
       <button class="tab-btn" data-status="cancelada">Canceladas <span class="tab-count" id="cnt-cancelada">0</span></button>
     </div>
+
     <div id="reservations-list">
-      <div class="admin-loading"><div class="loading-spinner" style="margin:0 auto 12px;"></div>Cargando...</div>
+      <div class="admin-loading">
+        <div class="loading-spinner" style="margin:0 auto 12px;"></div>
+        Cargando reservas...
+      </div>
     </div>
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { initializeApp, getApps, getApp }
+      from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signInWithPopup,
@@ -284,7 +312,7 @@
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
     const firebaseConfig = {
-      apiKey:            "AIzaSyDFsFLw518RovvIPGcIzFDrih4oKBKgz-o",           
+      apiKey:            "AIzaSyDFsFLw518RovvIPGcIzFDrih4oKBKgz-o",
       authDomain:        "women-secret-nails.firebaseapp.com",
       projectId:         "women-secret-nails",
       storageBucket:     "women-secret-nails.firebasestorage.app",
@@ -293,28 +321,27 @@
     };
 
     const AUTHORIZED_EMAIL = "tatismahecha01@gmail.com";
-
-    const app  = initializeApp(firebaseConfig);
+    const app  = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const db   = getFirestore(app);
     const auth = getAuth(app);
     const gProvider = new GoogleAuthProvider();
 
-    const loginScreen   = document.getElementById("login-screen");
-    const adminPanel    = document.getElementById("admin-panel");
-    const loginError    = document.getElementById("login-error");
-    const listEl        = document.getElementById("reservations-list");
-    const filterDate    = document.getElementById("filter-date");
+    const loginScreen = document.getElementById("login-screen");
+    const adminPanel  = document.getElementById("admin-panel");
+    const loginError  = document.getElementById("login-error");
+    const listEl      = document.getElementById("reservations-list");
+    const filterDate  = document.getElementById("filter-date");
 
-    let allRes      = [];
-    let curStatus   = "pendiente";
-    let dateFilter  = null;
+    let allRes     = [];
+    let curStatus  = "pendiente";
+    let dateFilter = null;
 
-    // Fecha de hoy
+    // Hoy por defecto
     const now = new Date();
     filterDate.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
     dateFilter = filterDate.value;
 
-    // ── Auth listener ──────────────────────────────────────────
+    // ── Auth ──────────────────────────────────────────────────────
     onAuthStateChanged(auth, user => {
       if (user && user.email === AUTHORIZED_EMAIL) {
         loginScreen.style.display = "none";
@@ -332,17 +359,16 @@
       }
     });
 
-    // ── Google login ───────────────────────────────────────────
     document.getElementById("btn-google").onclick = async () => {
       try { await signInWithPopup(auth, gProvider); }
       catch { showErr("Error con Google. Intenta de nuevo."); }
     };
 
-    // ── Email login ────────────────────────────────────────────
     document.getElementById("btn-email-login").onclick = loginEmail;
     document.getElementById("login-password").addEventListener("keydown", e => {
       if (e.key === "Enter") loginEmail();
     });
+
     async function loginEmail() {
       const email = document.getElementById("login-email").value.trim();
       const pass  = document.getElementById("login-password").value;
@@ -351,21 +377,21 @@
       catch { showErr("Correo o contraseña incorrectos."); }
     }
 
-    // ── Sign out ───────────────────────────────────────────────
     document.getElementById("btn-signout").onclick = () => signOut(auth);
+    function showErr(msg) { loginError.textContent = msg; loginError.style.display = "block"; }
 
-    function showErr(msg) {
-      loginError.textContent   = msg;
-      loginError.style.display = "block";
-    }
-
-    // ── Cargar reservas ────────────────────────────────────────
+    // ── Cargar reservas ───────────────────────────────────────────
     async function loadReservations() {
       listEl.innerHTML = `<div class="admin-loading"><div class="loading-spinner" style="margin:0 auto 12px;"></div>Cargando...</div>`;
       try {
-        const snap = await getDocs(query(collection(db,"reservations"), orderBy("date","asc"), orderBy("time","asc")));
+        const snap = await getDocs(query(
+          collection(db,"reservations"),
+          orderBy("date","asc"),
+          orderBy("time","asc")
+        ));
         allRes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        updateCounts(); renderList();
+        updateCounts();
+        renderList();
       } catch(err) {
         console.error(err);
         listEl.innerHTML = `<p style="text-align:center;color:var(--rose-deep);padding:40px;">Error cargando reservas.</p>`;
@@ -379,62 +405,119 @@
       });
     }
 
+    // ── Renderizar lista ──────────────────────────────────────────
     function renderList() {
-      const list = allRes.filter(r => r.status === curStatus && (!dateFilter || r.date === dateFilter));
+      const list = allRes.filter(r =>
+        r.status === curStatus && (!dateFilter || r.date === dateFilter)
+      );
+
       if (!list.length) {
         const icons = { pendiente:"🎉", confirmada:"📅", cancelada:"🚫" };
-        listEl.innerHTML = `<div class="admin-empty"><div class="admin-empty-icon">${icons[curStatus]}</div>
-          <p>No hay reservas ${curStatus === "pendiente" ? "pendientes" : curStatus === "confirmada" ? "confirmadas" : "canceladas"}
-          ${dateFilter ? "para este día." : "aún."}</p></div>`;
+        listEl.innerHTML = `<div class="admin-empty">
+          <div class="admin-empty-icon">${icons[curStatus]}</div>
+          <p>No hay reservas ${curStatus === "pendiente" ? "pendientes"
+            : curStatus === "confirmada" ? "confirmadas" : "canceladas"}
+            ${dateFilter ? "para este día." : "aún."}</p>
+        </div>`;
         return;
       }
+
       listEl.innerHTML = "";
       list.forEach((res, i) => {
         const card = document.createElement("div");
         card.className = "reservation-card";
         card.style.animationDelay = `${i*0.05}s`;
+
         const pIcon = res.payment === "efectivo" ? "💵" : "💳";
         const pStr  = res.payment === "efectivo" ? "Efectivo" : "Virtual";
+
+        // Teléfono como enlace de llamada si existe
+        const phoneHtml = res.phone
+          ? `<a href="tel:${res.phone}" class="phone-link">📞 ${res.phone}</a>`
+          : `<span style="color:var(--text-light);font-size:13px;">Sin teléfono</span>`;
+
+        const clientName = res.clientName || res.client || null;
+
         card.innerHTML = `
           <div class="res-top">
             <div>
               <p class="res-service">${res.service || "Servicio"}</p>
+              ${clientName ? `<p class="res-client">👤 ${clientName}</p>` : ""}
               <p class="res-specialist">👩‍💼 ${res.specialist || "Sin asignar"}</p>
             </div>
             <span class="status-badge badge-${res.status}">${res.status}</span>
           </div>
           <div class="res-grid">
-            <div class="res-item"><span class="res-item-label">Fecha</span><span class="res-item-value">📅 ${fmtDate(res.date)}</span></div>
-            <div class="res-item"><span class="res-item-label">Hora</span><span class="res-item-value">🕐 ${fmtTime(res.time)}</span></div>
-            <div class="res-item"><span class="res-item-label">Duración</span><span class="res-item-value">⏱ ${res.duration || "—"} min</span></div>
-            <div class="res-item"><span class="res-item-label">Pago</span><span class="res-item-value">${pIcon} ${pStr}</span></div>
+            <div class="res-item">
+              <span class="res-item-label">Fecha</span>
+              <span class="res-item-value">📅 ${fmtDate(res.date)}</span>
+            </div>
+            <div class="res-item">
+              <span class="res-item-label">Hora</span>
+              <span class="res-item-value">🕐 ${fmtTime(res.time)}</span>
+            </div>
+            <div class="res-item">
+              <span class="res-item-label">Duración</span>
+              <span class="res-item-value">⏱ ${res.duration || "—"} min</span>
+            </div>
+            <div class="res-item">
+              <span class="res-item-label">Pago</span>
+              <span class="res-item-value">${pIcon} ${pStr}</span>
+            </div>
+            <div class="res-item">
+              <span class="res-item-label">Contacto</span>
+              <span class="res-item-value">${phoneHtml}</span>
+            </div>
           </div>
-          ${res.status === "pendiente" ? `<div class="res-actions">
-            <button class="btn-confirm-res" data-id="${res.id}">✓ Confirmar</button>
-            <button class="btn-cancel-res"  data-id="${res.id}">✕ Cancelar</button>
-          </div>` : ""}
+
+          <!-- ✅ Acciones flexibles — siempre visibles para todos los estados -->
+          <div class="res-actions">
+            <button class="action-btn btn-confirmar"
+              data-id="${res.id}" data-action="confirmada"
+              ${res.status === "confirmada" ? "disabled" : ""}>
+              ✓ Confirmar
+            </button>
+            <button class="action-btn btn-pendiente"
+              data-id="${res.id}" data-action="pendiente"
+              ${res.status === "pendiente" ? "disabled" : ""}>
+              ⏳ En espera
+            </button>
+            <button class="action-btn btn-cancelar"
+              data-id="${res.id}" data-action="cancelada"
+              ${res.status === "cancelada" ? "disabled" : ""}>
+              ✕ Cancelar
+            </button>
+          </div>
         `;
         listEl.appendChild(card);
       });
-      listEl.querySelectorAll(".btn-confirm-res").forEach(b =>
-        b.onclick = () => changeStatus(b.dataset.id, "confirmada", b));
-      listEl.querySelectorAll(".btn-cancel-res").forEach(b =>
-        b.onclick = () => changeStatus(b.dataset.id, "cancelada", b));
+
+      // Eventos de los botones de acción
+      listEl.querySelectorAll(".action-btn:not(:disabled)").forEach(btn => {
+        btn.onclick = () => changeStatus(btn.dataset.id, btn.dataset.action, btn);
+      });
     }
 
-    async function changeStatus(id, status, btn) {
+    // ── Cambiar estado — cualquier estado a cualquier estado ──────
+    async function changeStatus(id, newStatus, btn) {
       const actions = btn.closest(".res-actions");
+      const prev    = actions.innerHTML;
       actions.innerHTML = `<p style="font-size:13px;color:var(--text-light);padding:6px;">Guardando...</p>`;
+
       try {
-        await updateDoc(doc(db,"reservations",id), { status });
-        const i = allRes.findIndex(r => r.id === id);
-        if (i > -1) allRes[i].status = status;
-        updateCounts(); renderList();
+        await updateDoc(doc(db,"reservations",id), { status: newStatus });
+        const idx = allRes.findIndex(r => r.id === id);
+        if (idx > -1) allRes[idx].status = newStatus;
+        updateCounts();
+        renderList();
       } catch(err) {
-        actions.innerHTML = `<p style="color:var(--rose-deep);font-size:13px;">Error. Intenta de nuevo.</p>`;
+        console.error(err);
+        actions.innerHTML = prev;
+        alert("Error al actualizar. Intenta de nuevo.");
       }
     }
 
+    // ── Tabs ──────────────────────────────────────────────────────
     document.querySelectorAll(".tab-btn").forEach(btn => btn.onclick = () => {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
@@ -442,11 +525,15 @@
       renderList();
     });
 
-    filterDate.onchange = () => { dateFilter = filterDate.value || null; updateCounts(); renderList(); };
+    filterDate.onchange = () => {
+      dateFilter = filterDate.value || null;
+      updateCounts(); renderList();
+    };
     document.getElementById("btn-show-all").onclick = () => {
       filterDate.value = ""; dateFilter = null; updateCounts(); renderList();
     };
 
+    // ── Helpers ───────────────────────────────────────────────────
     function fmtDate(s) {
       if (!s) return "—";
       const [y,m,d] = s.split("-");
