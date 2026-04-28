@@ -1,9 +1,9 @@
 // =====================================================
-// js/services.js — Fase 3 actualizada
-// ✅ 5 pasos: fecha · especialista · cliente · pago · confirmar
-// ✅ Nombre y teléfono del cliente guardados en Firestore
-// ✅ Bloqueo de horarios por duración
-// ✅ Sin doble reserva
+// js/services.js — con Auth de clientes
+// ✅ Verifica si hay sesión activa o invitada
+// ✅ Auto-rellena nombre si el cliente está logueado
+// ✅ Muestra avatar + nombre en el header
+// ✅ 5 pasos completos con todos los campos
 // =====================================================
 
 import { db } from "./firebase-config.js";
@@ -11,6 +11,8 @@ import {
   collection, getDocs, addDoc,
   query, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
 // ─── Config del negocio ───────────────────────────────────────────────────────
 const BUSINESS = {
@@ -29,7 +31,6 @@ const EMOJIS = {
 };
 const emoji = n => EMOJIS[n?.toLowerCase().trim()] || "💅";
 
-// ─── Formatters ───────────────────────────────────────────────────────────────
 const fmtPrice = p => {
   if (!p) return "Consultar";
   const n = parseInt(String(p).replace(/\D/g,""),10);
@@ -57,7 +58,7 @@ function genSlots() {
   return s;
 }
 const toMin = t => { const [h,m]=t.split(":").map(Number); return h*60+m; };
-const blocked = (slot,res) => res.some(r=>{
+const isBlocked = (slot,res) => res.some(r=>{
   const s=toMin(r.time),e=s+(r.duration||30);
   return toMin(slot)>=s&&toMin(slot)<e;
 });
@@ -71,8 +72,26 @@ const bk = {
   payment:null,
 };
 
+let currentUser = null;
+const isGuest   = sessionStorage.getItem("wsn-guest") === "true";
+
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
+
+  // ── Guard: si no hay sesión ni invitado → al login ────────────────────────
+  if (!isGuest) {
+    const auth = getAuth();
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        window.location.href = "index.html";
+      } else {
+        currentUser = user;
+        renderClientNav(user);
+      }
+    });
+  } else {
+    renderGuestNav();
+  }
 
   const grid       = document.getElementById("services-grid");
   const modal      = document.getElementById("reservation-modal");
@@ -81,9 +100,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalTitle = document.getElementById("modal-service-name");
   const modalMeta  = document.getElementById("modal-service-meta");
 
-  const TOTAL_STEPS = 5;
-  const stepEls  = Array.from({length:TOTAL_STEPS},(_,i)=>document.getElementById(`step-${i+1}`));
-  const stepDots = Array.from({length:TOTAL_STEPS},(_,i)=>document.getElementById(`step-dot-${i+1}`));
+  const TOTAL = 5;
+  const stepEls  = Array.from({length:TOTAL},(_,i)=>document.getElementById(`step-${i+1}`));
+  const stepDots = Array.from({length:TOTAL},(_,i)=>document.getElementById(`step-dot-${i+1}`));
   const stepOk   = document.getElementById("step-success");
 
   const dateInput   = document.getElementById("reservation-date");
@@ -91,11 +110,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const staffListEl = document.getElementById("staff-list");
   const nameInput   = document.getElementById("client-name");
   const phoneInput  = document.getElementById("client-phone");
-
   const confirmBtn  = document.getElementById("confirm-reservation");
   const closeOk     = document.getElementById("close-success");
 
-  // Resumen
   const sumService    = document.getElementById("summary-service");
   const sumSpecialist = document.getElementById("summary-specialist");
   const sumDate       = document.getElementById("summary-date");
@@ -115,14 +132,14 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const snap = await getDocs(query(collection(db,"staff"),where("active","==",true)));
       staffMembers = snap.docs.map(d=>({id:d.id,...d.data()}));
-    } catch(e) { staffMembers = []; }
+    } catch(e) { staffMembers=[]; }
   }
 
   // ── Cargar servicios ───────────────────────────────────────────────────────
   async function loadServices() {
     try {
       const snap = await getDocs(query(collection(db,"services"),where("active","==",true)));
-      grid.innerHTML = "";
+      grid.innerHTML="";
       if(snap.empty){ grid.innerHTML=`<p class="empty-msg">No hay servicios disponibles.</p>`; return; }
       snap.forEach(doc=>{
         const d=doc.data();
@@ -142,9 +159,9 @@ document.addEventListener("DOMContentLoaded", () => {
             <button class="card-btn">Reservar</button>
           </div>`;
         grid.appendChild(card);
-        card.querySelector(".card-btn").onclick = ()=>openModal(doc.id,name,price,dur);
+        card.querySelector(".card-btn").onclick=()=>openModal(doc.id,name,price,dur);
       });
-    } catch(e) {
+    } catch(e){
       grid.innerHTML=`<p class="empty-msg" style="color:var(--rose-deep)">Error cargando servicios.</p>`;
     }
   }
@@ -161,7 +178,14 @@ document.addEventListener("DOMContentLoaded", () => {
     modalMeta.textContent=`${fmtPrice(price)} · ~${duration} min`;
     dateInput.value="";
     timeSlotsEl.innerHTML=`<p class="slots-hint">Selecciona una fecha para ver los horarios.</p>`;
-    nameInput.value=""; phoneInput.value="";
+
+    // Auto-rellenar nombre si está logueada
+    if(currentUser){
+      nameInput.value = currentUser.displayName || currentUser.email.split("@")[0];
+    } else {
+      nameInput.value="";
+    }
+    phoneInput.value="";
     document.querySelectorAll("input[name='payment']").forEach(r=>r.checked=false);
     goTo(1);
     modal.style.display="flex";
@@ -173,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
   backdrop?.addEventListener("click",closeModal);
   closeOk?.addEventListener("click",closeModal);
 
-  // ── Fecha → slots ──────────────────────────────────────────────────────────
+  // ── Cambio de fecha → slots ────────────────────────────────────────────────
   dateInput?.addEventListener("change", async ()=>{
     const date=dateInput.value; if(!date) return;
     bk.date=date; bk.time=null;
@@ -203,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let any=false;
     all.forEach(slot=>{
       const sm=toMin(slot);
-      const ok=(sm+bk.serviceDuration)<=closeMin&&!(isToday&&sm<=nowMin+30)&&!blocked(slot,reserved);
+      const ok=(sm+bk.serviceDuration)<=closeMin&&!(isToday&&sm<=nowMin+30)&&!isBlocked(slot,reserved);
       const btn=document.createElement("button");
       btn.className="time-slot"; btn.dataset.time=slot; btn.textContent=fmtTime(slot);
       if(!ok){btn.classList.add("taken");btn.disabled=true;}else any=true;
@@ -252,7 +276,6 @@ document.addEventListener("DOMContentLoaded", () => {
         bk.specialist=m.name; bk.specialistId=m.id;
       };
     });
-    // Auto-seleccionar si hay solo una
     if(staffMembers.length===1){
       const r=staffListEl.querySelector("input");
       if(r){ r.checked=true; staffListEl.querySelector(".staff-card").classList.add("selected");
@@ -272,7 +295,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if(n===2) renderStaff();
   }
 
-  // 1→2
   document.getElementById("next-step-2")?.addEventListener("click",()=>{
     if(!bk.date){shake(dateInput);return;}
     if(!bk.time){shake(timeSlotsEl);return;}
@@ -280,17 +302,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   document.getElementById("back-step-1")?.addEventListener("click",()=>goTo(1));
 
-  // 2→3
   document.getElementById("next-step-3")?.addEventListener("click",()=>{
     if(!bk.specialist){shake(staffListEl);return;}
     goTo(3);
   });
   document.getElementById("back-step-2")?.addEventListener("click",()=>goTo(2));
 
-  // 3→4
   document.getElementById("next-step-4")?.addEventListener("click",()=>{
-    const name=nameInput.value.trim();
-    const phone=phoneInput.value.trim();
+    const name=nameInput.value.trim(), phone=phoneInput.value.trim();
     if(!name){shake(nameInput);return;}
     if(!phone){shake(phoneInput);return;}
     bk.clientName=name; bk.clientPhone=phone;
@@ -298,7 +317,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   document.getElementById("back-step-3")?.addEventListener("click",()=>goTo(3));
 
-  // 4→5
   document.getElementById("next-step-5")?.addEventListener("click",()=>{
     const sel=document.querySelector("input[name='payment']:checked");
     if(!sel){shake(document.querySelector(".payment-options"));return;}
@@ -308,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
     sumDate.textContent       = fmtDate(bk.date);
     sumTime.textContent       = fmtTime(bk.time);
     sumClient.textContent     = `${bk.clientName} · ${bk.clientPhone}`;
-    sumPayment.textContent    = bk.payment==="efectivo"?"💵 Efectivo":"💳 Virtual (Nequi/Transferencia)";
+    sumPayment.textContent    = bk.payment==="efectivo"?"💵 Efectivo":"💳 Virtual";
     sumPrice.textContent      = fmtPrice(bk.servicePrice);
     goTo(5);
   });
@@ -328,6 +346,8 @@ document.addEventListener("DOMContentLoaded", () => {
         specialistId: bk.specialistId,
         clientName:   bk.clientName,
         phone:        bk.clientPhone,
+        userEmail:    currentUser?.email || "invitada",
+        userId:       currentUser?.uid   || "guest",
         payment:      bk.payment,
         status:       "pendiente",
         createdAt:    serverTimestamp(),
@@ -351,7 +371,7 @@ document.addEventListener("DOMContentLoaded", () => {
     el.addEventListener("animationend",()=>{el.style.animation="";},{once:true});
   }
 
-  // ── Estilos extra ──────────────────────────────────────────────────────────
+  // ── Estilos dinámicos ──────────────────────────────────────────────────────
   const st=document.createElement("style");
   st.textContent=`
     @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
@@ -373,7 +393,31 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
   document.head.appendChild(st);
 
-  // ── Iniciar ────────────────────────────────────────────────────────────────
   loadStaff();
   loadServices();
 });
+
+// ── Header nav helpers ─────────────────────────────────────────────────────────
+function renderClientNav(user) {
+  const slot = document.getElementById("client-nav-slot");
+  if (!slot) return;
+  const name = user.displayName || user.email.split("@")[0];
+  slot.innerHTML = `
+    <a href="profile.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+      <span class="client-name-nav">${name}</span>
+      <div class="client-avatar">
+        ${user.photoURL
+          ? `<img src="${user.photoURL}" alt="${name}">`
+          : name.charAt(0).toUpperCase()}
+      </div>
+    </a>`;
+}
+
+function renderGuestNav() {
+  const slot = document.getElementById("client-nav-slot");
+  if (!slot) return;
+  slot.innerHTML = `
+    <span class="guest-nav-badge">
+      Invitada · <a href="index.html">Inicia sesión</a>
+    </span>`;
+}
