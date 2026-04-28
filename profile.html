@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi perfil · Women Secret Nails</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .profile-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 clamp(16px,4vw,40px) 80px;
+      position: relative; z-index: 1;
+    }
+
+    /* ── Hero del perfil ── */
+    .profile-hero {
+      background: linear-gradient(135deg, #2c1f22, #c97b8a);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-hero::before {
+      content: '💅';
+      position: absolute;
+      right: 24px; top: 16px;
+      font-size: 80px;
+      opacity: 0.12;
+      user-select: none;
+    }
+    .profile-avatar-big {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: 3px solid rgba(255,255,255,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; overflow: hidden; flex-shrink: 0;
+    }
+    .profile-avatar-big img { width:100%; height:100%; object-fit:cover; }
+    .profile-info { flex: 1; }
+    .profile-name {
+      font-family: var(--font-display);
+      font-size: 28px; font-weight: 400;
+      color: white; margin-bottom: 4px; line-height: 1.1;
+    }
+    .profile-email { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 12px; }
+    .profile-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50px; padding: 4px 12px;
+      font-size: 11px; color: rgba(255,255,255,0.85);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Stats ── */
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: var(--radius-md);
+      padding: 20px 16px;
+      text-align: center;
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(212,184,150,0.15);
+    }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 36px; font-weight: 400;
+      color: var(--rose-deep); line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 11px; color: var(--text-light);
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    /* ── Secciones ── */
+    .section-head {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 24px; font-weight: 400; color: var(--text-dark);
+    }
+    .section-link {
+      font-size: 12px; color: var(--rose-deep);
+      cursor: pointer; letter-spacing: 0.04em;
+    }
+
+    /* ── Cita card ── */
+    .cita-card {
+      background: white;
+      border-radius: var(--radius-md);
+      padding: 20px 22px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(212,184,150,0.15);
+      display: flex; align-items: center; gap: 16px;
+      opacity: 0; animation: fadeUp 0.3s forwards;
+    }
+    .cita-icon {
+      width: 48px; height: 48px; border-radius: var(--radius-sm);
+      background: var(--rose-pale);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .cita-info { flex: 1; }
+    .cita-service {
+      font-family: var(--font-display);
+      font-size: 18px; font-weight: 400; color: var(--text-dark);
+      margin-bottom: 2px;
+    }
+    .cita-meta { font-size: 12px; color: var(--text-light); }
+    .cita-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .cita-status {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 4px 10px;
+      border-radius: var(--radius-xl);
+    }
+    .st-pendiente  { background: var(--gold-pale);  color: var(--nude-deep); }
+    .st-confirmada { background: #e8f5e9;            color: #388e3c; }
+    .st-cancelada  { background: var(--rose-pale);   color: var(--rose-deep); }
+    .btn-cancel-cita {
+      font-size: 11px; color: var(--rose-deep);
+      background: none; border: none; cursor: pointer;
+      font-family: var(--font-body);
+      padding: 0; text-decoration: underline;
+      opacity: 0.7;
+    }
+    .btn-cancel-cita:hover { opacity: 1; }
+
+    /* ── Promo WSN ── */
+    .promo-section { margin-top: 40px; margin-bottom: 32px; }
+    .promo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media(max-width:480px){ .promo-grid { grid-template-columns: 1fr; } }
+
+    .promo-card {
+      border-radius: var(--radius-md);
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .promo-card-1 {
+      background: linear-gradient(135deg, #2c1f22, #c97b8a);
+    }
+    .promo-card-2 {
+      background: linear-gradient(135deg, #b89272, #f5ead8);
+    }
+    .promo-card-3 {
+      background: linear-gradient(135deg, #388e3c, #a5d6a7);
+    }
+    .promo-card-4 {
+      background: linear-gradient(135deg, #4a2d35, #e8a4b0);
+    }
+    .promo-deco {
+      position: absolute;
+      top: 12px; right: 16px;
+      font-size: 52px; opacity: 0.2;
+      user-select: none;
+    }
+    .promo-label {
+      font-size: 10px; letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 6px;
+    }
+    .promo-title {
+      font-family: var(--font-display);
+      font-size: 22px; font-weight: 400;
+      color: white; line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .promo-card-2 .promo-label,
+    .promo-card-2 .promo-title { color: var(--text-dark); }
+    .promo-card-3 .promo-label { color: rgba(0,0,0,0.5); }
+    .promo-card-3 .promo-title { color: white; }
+    .promo-btn {
+      display: inline-flex;
+      padding: 8px 18px;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: 12px; color: white;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: background 0.2s;
+      text-decoration: none;
+      width: fit-content;
+    }
+    .promo-btn:hover { background: rgba(255,255,255,0.3); }
+    .promo-card-2 .promo-btn {
+      background: rgba(0,0,0,0.1);
+      border-color: rgba(0,0,0,0.2);
+      color: var(--text-dark);
+    }
+
+    /* ── Empty states ── */
+    .empty-citas {
+      text-align: center; padding: 40px 20px;
+      color: var(--text-light);
+    }
+    .empty-citas-icon { font-size: 36px; margin-bottom: 10px; }
+    .empty-citas p { font-size: 14px; font-weight: 300; margin-bottom: 16px; }
+
+    /* ── Invitada banner ── */
+    .guest-banner {
+      background: linear-gradient(135deg, var(--rose-pale), var(--gold-pale));
+      border: 1px solid rgba(212,184,150,0.3);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .guest-banner h3 {
+      font-family: var(--font-display);
+      font-size: 22px; font-weight: 400; color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    .guest-banner p {
+      font-size: 14px; color: var(--text-mid);
+      margin-bottom: 16px; font-weight: 300; line-height: 1.6;
+    }
+
+    .profile-loading {
+      text-align: center; padding: 60px;
+      color: var(--text-light); font-size: 14px;
+    }
+  </style>
+</head>
+<body class="services-page">
+  <div class="bg-orb bg-orb--1"></div>
+  <div class="bg-orb bg-orb--2"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo-mark">WSN</a>
+      <nav class="header-nav">
+        <a href="services.html">Servicios</a>
+        <span class="nav-current">Mi perfil</span>
+        <button id="btn-signout" class="nav-cta" style="cursor:pointer;border:none;">Salir</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="profile-wrap">
+
+    <!-- Loading -->
+    <div id="profile-loading" class="profile-loading">
+      <div class="loading-spinner" style="margin:0 auto 12px;"></div>
+      Cargando tu perfil...
+    </div>
+
+    <!-- Contenido (oculto hasta cargar) -->
+    <div id="profile-content" style="display:none;">
+
+      <!-- Hero -->
+      <div class="profile-hero">
+        <div class="profile-avatar-big" id="p-avatar">💅</div>
+        <div class="profile-info">
+          <h2 class="profile-name" id="p-name">Linda</h2>
+          <p class="profile-email" id="p-email"></p>
+          <span class="profile-badge" id="p-badge">✨ Cliente WSN</span>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="profile-stats">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">Citas totales</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-confirmadas">0</div>
+          <div class="stat-label">Confirmadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-proximas">0</div>
+          <div class="stat-label">Próximas</div>
+        </div>
+      </div>
+
+      <!-- Próximas citas -->
+      <div class="section-head">
+        <h3 class="section-title">Próximas citas</h3>
+      </div>
+      <div id="proximas-list"></div>
+
+      <!-- Historial -->
+      <div class="section-head" style="margin-top:32px;">
+        <h3 class="section-title">Historial</h3>
+        <span class="section-link" id="toggle-historial">Ver todas →</span>
+      </div>
+      <div id="historial-list"></div>
+
+      <!-- Agendar nueva -->
+      <div style="text-align:center;margin-top:32px;">
+        <a href="services.html" class="btn-primary">+ Agendar nueva cita</a>
+      </div>
+
+      <!-- Publicidad WSN -->
+      <div class="promo-section">
+        <div class="section-head">
+          <h3 class="section-title">Women <em style="font-style:italic;color:var(--rose-deep)">Secret</em> world</h3>
+        </div>
+        <div class="promo-grid">
+          <div class="promo-card promo-card-1">
+            <span class="promo-deco">💅</span>
+            <p class="promo-label">Nuevo servicio</p>
+            <p class="promo-title">Press On personalizadas</p>
+            <a href="services.html" class="promo-btn">Reservar ahora</a>
+          </div>
+          <div class="promo-card promo-card-2">
+            <span class="promo-deco">🌿</span>
+            <p class="promo-label">Tendencia</p>
+            <p class="promo-title">Cejas en Henna — larga duración</p>
+            <a href="services.html" class="promo-btn">Ver más</a>
+          </div>
+          <div class="promo-card promo-card-3">
+            <span class="promo-deco">💼</span>
+            <p class="promo-label">Únete al equipo</p>
+            <p class="promo-title">¿Quieres trabajar con nosotras?</p>
+            <a href="careers.html" class="promo-btn">Aplica aquí</a>
+          </div>
+          <div class="promo-card promo-card-4">
+            <span class="promo-deco">✨</span>
+            <p class="promo-label">Regala belleza</p>
+            <p class="promo-title">Bono de regalo para quien amas</p>
+            <a href="services.html" class="promo-btn">Próximamente</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Banner invitada -->
+    <div id="guest-content" style="display:none;">
+      <div class="guest-banner">
+        <h3>¡Hola, linda! 💅</h3>
+        <p>Estás navegando como invitada.<br>Crea una cuenta para ver tus citas, cancelarlas y recibir ofertas exclusivas.</p>
+        <a href="index.html" class="btn-primary">Crear cuenta o iniciar sesión</a>
+      </div>
+
+      <!-- Promos también para invitadas -->
+      <div class="promo-section">
+        <div class="section-head">
+          <h3 class="section-title">Women <em style="font-style:italic;color:var(--rose-deep)">Secret</em> world</h3>
+        </div>
+        <div class="promo-grid">
+          <div class="promo-card promo-card-1">
+            <span class="promo-deco">💅</span>
+            <p class="promo-label">Nuevo servicio</p>
+            <p class="promo-title">Press On personalizadas</p>
+            <a href="services.html" class="promo-btn">Reservar ahora</a>
+          </div>
+          <div class="promo-card promo-card-2">
+            <span class="promo-deco">🌿</span>
+            <p class="promo-label">Tendencia</p>
+            <p class="promo-title">Cejas en Henna — larga duración</p>
+            <a href="services.html" class="promo-btn">Ver más</a>
+          </div>
+          <div class="promo-card promo-card-3">
+            <span class="promo-deco">💼</span>
+            <p class="promo-label">Únete al equipo</p>
+            <p class="promo-title">¿Quieres trabajar con nosotras?</p>
+            <a href="careers.html" class="promo-btn">Aplica aquí</a>
+          </div>
+          <div class="promo-card promo-card-4">
+            <span class="promo-deco">✨</span>
+            <p class="promo-label">Regala belleza</p>
+            <p class="promo-title">Bono de regalo para quien amas</p>
+            <a href="services.html" class="promo-btn">Próximamente</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end profile-wrap -->
+
+  <script type="module">
+    import { initializeApp, getApps, getApp }
+      from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc,
+             query, where, orderBy }
+      from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut }
+      from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyDFsFLw518RovvIPGcIzFDrih4oKBKgz-o",
+      authDomain:        "women-secret-nails.firebaseapp.com",
+      projectId:         "women-secret-nails",
+      storageBucket:     "women-secret-nails.firebasestorage.app",
+      messagingSenderId: "245460116956",
+      appId:             "1:245460116956:web:a0881d15b5bbf76119db19"
+    };
+
+    const app  = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const db   = getFirestore(app);
+    const auth = getAuth(app);
+
+    const isGuest  = sessionStorage.getItem("wsn-guest") === "true";
+    const loadEl   = document.getElementById("profile-loading");
+    const contentEl= document.getElementById("profile-content");
+    const guestEl  = document.getElementById("guest-content");
+
+    let showAll = false;
+    let allCitas = [];
+
+    // ── Sign out ──────────────────────────────────────────────
+    document.getElementById("btn-signout").onclick = async () => {
+      if (isGuest) {
+        sessionStorage.removeItem("wsn-guest");
+        window.location.href = "index.html";
+      } else {
+        await signOut(auth);
+        window.location.href = "index.html";
+      }
+    };
+
+    // ── Auth check ────────────────────────────────────────────
+    onAuthStateChanged(auth, async user => {
+      if (isGuest && !user) {
+        loadEl.style.display   = "none";
+        guestEl.style.display  = "block";
+        return;
+      }
+      if (!user && !isGuest) {
+        window.location.href = "index.html"; return;
+      }
+      if (user) {
+        loadEl.style.display    = "none";
+        contentEl.style.display = "block";
+        renderHero(user);
+        await loadCitas(user.email);
+      }
+    });
+
+    // ── Hero ──────────────────────────────────────────────────
+    function renderHero(user) {
+      const name = user.displayName || user.email.split("@")[0];
+      document.getElementById("p-name").textContent  = name;
+      document.getElementById("p-email").textContent = user.email;
+      const av = document.getElementById("p-avatar");
+      if (user.photoURL) av.innerHTML = `<img src="${user.photoURL}" alt="">`;
+      else av.textContent = name.charAt(0).toUpperCase();
+    }
+
+    // ── Citas ──────────────────────────────────────────────────
+    async function loadCitas(email) {
+      try {
+        const snap = await getDocs(query(
+          collection(db,"reservations"),
+          where("clientName","!=",""),
+          orderBy("clientName"),
+          orderBy("date","desc")
+        ));
+
+        // Filtramos por email (no tenemos uid en reservas aún, usamos phone/name match)
+        // Por ahora traemos todas y filtramos del lado cliente por correo si existe
+        // En la siguiente iteración guardaremos el uid del usuario
+        allCitas = snap.docs.map(d=>({id:d.id,...d.data()}));
+
+        const today = new Date().toISOString().split("T")[0];
+        const proximas  = allCitas.filter(c => c.date >= today && c.status !== "cancelada");
+        const historial = allCitas.filter(c => c.date < today || c.status === "cancelada");
+
+        // Stats
+        document.getElementById("stat-total").textContent       = allCitas.length;
+        document.getElementById("stat-confirmadas").textContent  = allCitas.filter(c=>c.status==="confirmada").length;
+        document.getElementById("stat-proximas").textContent     = proximas.length;
+
+        renderProximas(proximas);
+        renderHistorial(historial, false);
+
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function renderProximas(list) {
+      const el = document.getElementById("proximas-list");
+      if (!list.length) {
+        el.innerHTML = `<div class="empty-citas">
+          <div class="empty-citas-icon">📅</div>
+          <p>No tienes citas próximas.</p>
+          <a href="services.html" class="btn-primary">Agendar ahora</a>
+        </div>`;
+        return;
+      }
+      el.innerHTML = "";
+      list.forEach((c,i) => {
+        el.appendChild(buildCitaCard(c, i, true));
+      });
+    }
+
+    function renderHistorial(list, all) {
+      const el = document.getElementById("historial-list");
+      const shown = all ? list : list.slice(0,3);
+      if (!list.length) {
+        el.innerHTML = `<div class="empty-citas">
+          <div class="empty-citas-icon">🌸</div>
+          <p>Tu historial de citas aparecerá aquí.</p>
+        </div>`;
+        return;
+      }
+      el.innerHTML = "";
+      shown.forEach((c,i) => el.appendChild(buildCitaCard(c, i, false)));
+    }
+
+    function buildCitaCard(c, i, canCancel) {
+      const card = document.createElement("div");
+      card.className = "cita-card";
+      card.style.animationDelay = `${i*0.05}s`;
+      const icons = {
+        "Semipermanente":"💅","Manicura tradicional":"🌸",
+        "Pedicura tradicional":"🦶","Manicura + Pedicura":"🌸",
+        "Acrílicas":"💎","Press On":"🎀","Cejas en Henna":"🌿",
+        "Depilación cejas":"✨","Shampoo":"🧴","Cepillado":"💇",
+      };
+      const ic = icons[c.service] || "💅";
+      const dateStr = fmtDate(c.date);
+      const timeStr = fmtTime(c.time);
+
+      card.innerHTML = `
+        <div class="cita-icon">${ic}</div>
+        <div class="cita-info">
+          <p class="cita-service">${c.service || "Servicio"}</p>
+          <p class="cita-meta">📅 ${dateStr} · 🕐 ${timeStr} · 👩‍💼 ${c.specialist||"—"}</p>
+        </div>
+        <div class="cita-right">
+          <span class="cita-status st-${c.status}">${c.status}</span>
+          ${canCancel && c.status !== "cancelada"
+            ? `<button class="btn-cancel-cita" data-id="${c.id}">Cancelar</button>`
+            : ""}
+        </div>`;
+
+      card.querySelector(".btn-cancel-cita")?.addEventListener("click", async () => {
+        if (!confirm("¿Segura que quieres cancelar esta cita?")) return;
+        try {
+          await updateDoc(doc(db,"reservations",c.id), { status:"cancelada" });
+          card.querySelector(".cita-status").textContent = "cancelada";
+          card.querySelector(".cita-status").className  = "cita-status st-cancelada";
+          card.querySelector(".btn-cancel-cita")?.remove();
+        } catch(e) { alert("Error al cancelar. Intenta de nuevo."); }
+      });
+
+      return card;
+    }
+
+    // Toggle historial
+    document.getElementById("toggle-historial")?.addEventListener("click", () => {
+      showAll = !showAll;
+      const historial = allCitas.filter(c => {
+        const today = new Date().toISOString().split("T")[0];
+        return c.date < today || c.status === "cancelada";
+      });
+      renderHistorial(historial, showAll);
+      document.getElementById("toggle-historial").textContent =
+        showAll ? "Ver menos ↑" : "Ver todas →";
+    });
+
+    // ── Helpers ───────────────────────────────────────────────
+    function fmtDate(s) {
+      if (!s) return "—";
+      const [y,m,d] = s.split("-");
+      const M=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+      return `${parseInt(d)} ${M[parseInt(m)-1]} ${y}`;
+    }
+    function fmtTime(t) {
+      if (!t) return "—";
+      const [h,m] = t.split(":").map(Number);
+      return `${h%12||12}:${String(m).padStart(2,"0")} ${h>=12?"pm":"am"}`;
+    }
+  </script>
+</body>
+</html>
