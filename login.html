@@ -19,98 +19,75 @@
       .welcome-wrap { grid-template-columns: 1fr; }
       .welcome-left  { display: none; }
     }
-
-    /* Lado izquierdo visual */
     .welcome-left {
       position: relative;
       background: linear-gradient(160deg, #2c1f22 0%, #4a2d35 50%, #c97b8a 100%);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 60px 52px;
-      overflow: hidden;
+      display: flex; flex-direction: column;
+      justify-content: flex-end; padding: 60px 52px; overflow: hidden;
     }
     .welcome-left::before {
-      content: '';
-      position: absolute; inset: 0;
+      content: ''; position: absolute; inset: 0;
       background:
         radial-gradient(circle at 30% 20%, rgba(232,164,176,0.3) 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, rgba(212,184,150,0.2) 0%, transparent 50%);
     }
     .left-deco {
       position: absolute; top: 40px; right: 40px;
-      font-size: 120px; font-weight: 300;
-      color: rgba(255,255,255,0.06);
-      font-family: var(--font-display);
-      line-height: 1; user-select: none;
+      font-size: 120px; color: rgba(255,255,255,0.06);
+      font-family: var(--font-display); line-height: 1; user-select: none;
     }
     .left-tag {
-      position: relative;
-      font-size: 10px; letter-spacing: 0.3em;
-      text-transform: uppercase; color: rgba(255,255,255,0.5);
-      margin-bottom: 20px;
+      position: relative; font-size: 10px; letter-spacing: 0.3em;
+      text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 20px;
     }
     .left-title {
-      position: relative;
-      font-family: var(--font-display);
-      font-size: clamp(48px,5vw,80px);
-      font-weight: 300; line-height: 0.95; color: white;
-      margin-bottom: 24px;
+      position: relative; font-family: var(--font-display);
+      font-size: clamp(48px,5vw,80px); font-weight: 300;
+      line-height: 0.95; color: white; margin-bottom: 24px;
     }
     .left-title em { font-style: italic; color: var(--rose-soft); }
     .left-desc {
-      position: relative;
-      font-size: 14px; font-weight: 300; line-height: 1.8;
-      color: rgba(255,255,255,0.6); max-width: 320px; margin-bottom: 40px;
+      position: relative; font-size: 14px; font-weight: 300;
+      line-height: 1.8; color: rgba(255,255,255,0.6);
+      max-width: 320px; margin-bottom: 40px;
     }
     .left-chips { position: relative; display: flex; flex-wrap: wrap; gap: 8px; }
     .left-chip {
-      padding: 6px 14px;
-      border: 1px solid rgba(255,255,255,0.2);
+      padding: 6px 14px; border: 1px solid rgba(255,255,255,0.2);
       border-radius: 50px; font-size: 11px;
       color: rgba(255,255,255,0.7); letter-spacing: 0.06em;
-      backdrop-filter: blur(4px);
     }
-
-    /* Lado derecho login */
     .welcome-right {
-      position: relative;
-      display: flex; flex-direction: column;
+      position: relative; display: flex; flex-direction: column;
       justify-content: center; align-items: center;
-      padding: 60px clamp(24px,6vw,72px);
-      background: var(--cream); overflow: hidden;
+      padding: 60px clamp(24px,6vw,72px); background: var(--cream); overflow: hidden;
     }
     .login-box { width: 100%; max-width: 380px; position: relative; z-index: 1; }
-
     .mobile-logo {
-      display: none;
-      font-family: var(--font-display); font-size: 28px; font-weight: 600;
-      color: var(--rose-deep); letter-spacing: 0.1em;
+      display: none; font-family: var(--font-display); font-size: 28px;
+      font-weight: 600; color: var(--rose-deep); letter-spacing: 0.1em;
       margin-bottom: 32px; text-align: center;
     }
     @media(max-width:768px){ .mobile-logo { display: block; } }
-
     .login-heading {
-      font-family: var(--font-display);
-      font-size: 36px; font-weight: 400; color: var(--text-dark);
-      margin-bottom: 6px; line-height: 1.1;
+      font-family: var(--font-display); font-size: 36px; font-weight: 400;
+      color: var(--text-dark); margin-bottom: 6px; line-height: 1.1;
     }
     .login-heading em { font-style: italic; color: var(--rose-deep); }
     .login-sub {
       font-size: 14px; font-weight: 300; color: var(--text-light);
       margin-bottom: 36px; line-height: 1.6;
     }
-
     .btn-google {
       width: 100%; padding: 14px; background: white; color: #3c4043;
       border: 1px solid #dadce0; border-radius: var(--radius-sm);
       font-family: var(--font-body); font-size: 14px; font-weight: 500;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      gap: 10px; transition: background var(--transition), box-shadow var(--transition);
+      cursor: pointer; display: flex; align-items: center;
+      justify-content: center; gap: 10px;
+      transition: background var(--transition), box-shadow var(--transition);
       margin-bottom: 12px;
     }
     .btn-google:hover { background: #f8f9fa; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-
     .auth-divider {
       display: flex; align-items: center; gap: 12px; margin: 4px 0 16px;
     }
@@ -121,14 +98,12 @@
       font-size:11px; color:var(--text-light);
       letter-spacing:0.1em; text-transform:uppercase;
     }
-
     .toggle-email {
       font-size:13px; color:var(--text-light); text-align:center;
       margin-bottom:16px; cursor:pointer; transition:color var(--transition);
     }
     .toggle-email:hover { color:var(--rose-deep); }
     .toggle-email span { color:var(--rose-deep); font-weight:500; }
-
     .field-label {
       display:block; font-size:11px; font-weight:500;
       letter-spacing:0.1em; text-transform:uppercase;
@@ -142,24 +117,20 @@
       outline:none; margin-bottom:12px; transition:border-color var(--transition);
     }
     .login-field:focus { border-color:var(--rose); }
-
     .login-error {
       background:var(--rose-pale); border:1px solid rgba(201,123,138,0.3);
       border-radius:var(--radius-sm); padding:10px 14px; font-size:13px;
       color:var(--rose-deep); margin-bottom:14px; display:none;
     }
-
     #email-form { display:none; }
     #email-form.visible { display:block; }
-
     .guest-sep {
       display:flex; align-items:center; gap:12px; margin:20px 0 16px;
     }
     .guest-sep::before,.guest-sep::after {
       content:''; flex:1; height:1px; background:rgba(212,184,150,0.2);
     }
-    .guest-sep span { font-size:11px; color:var(--text-light); letter-spacing:0.06em; }
-
+    .guest-sep span { font-size:11px; color:var(--text-light); }
     .btn-guest {
       width:100%; padding:12px; background:transparent; color:var(--text-light);
       border:1px dashed rgba(212,184,150,0.4); border-radius:var(--radius-sm);
@@ -167,35 +138,16 @@
       transition:color var(--transition), border-color var(--transition);
     }
     .btn-guest:hover { color:var(--text-mid); border-color:var(--nude); }
-
     .login-footer {
       font-size:11px; color:var(--text-light);
       text-align:center; margin-top:24px; line-height:1.6;
     }
-
-    /* Spinner de verificación */
-    .checking-session {
-      position: fixed; inset: 0;
-      background: var(--cream);
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 16px; z-index: 999;
-    }
-    .checking-session p {
-      font-size: 14px; color: var(--text-light); font-family: var(--font-body);
-    }
   </style>
 </head>
 <body>
+  <div class="welcome-wrap">
 
-  <!-- Pantalla de verificación de sesión -->
-  <div class="checking-session" id="checking">
-    <div class="loading-spinner"></div>
-    <p>Verificando sesión...</p>
-  </div>
-
-  <div class="welcome-wrap" id="login-page" style="display:none;">
-
-    <!-- Izquierda visual -->
+    <!-- Visual izquierdo -->
     <div class="welcome-left">
       <div class="left-deco">💅</div>
       <p class="left-tag">Bogotá · Colombia</p>
@@ -208,11 +160,10 @@
         <span class="left-chip">Press On</span>
         <span class="left-chip">Manicura</span>
         <span class="left-chip">Pedicura</span>
-        <span class="left-chip">Cepillado</span>
       </div>
     </div>
 
-    <!-- Derecha login -->
+    <!-- Login -->
     <div class="welcome-right">
       <div class="bg-orb bg-orb--1" style="position:absolute;top:-100px;right:-80px;z-index:0;"></div>
       <div class="bg-orb bg-orb--2" style="position:absolute;bottom:-60px;left:-60px;z-index:0;"></div>
@@ -245,12 +196,11 @@
           <input type="password" class="login-field" id="login-password" placeholder="Tu contraseña">
           <div class="login-error" id="login-error"></div>
           <button class="btn-primary btn-full" id="btn-email-login" style="margin-bottom:8px;">Entrar con email</button>
-          <button class="btn-ghost btn-full" id="btn-register" style="margin-bottom:0;">Crear cuenta nueva</button>
+          <button class="btn-ghost btn-full" id="btn-register">Crear cuenta nueva</button>
         </div>
 
         <div class="guest-sep"><span>o navega sin cuenta</span></div>
         <button class="btn-guest" id="btn-guest">Continuar como invitada →</button>
-
         <p class="login-footer">Tus datos están protegidos 🔒</p>
       </div>
     </div>
@@ -277,20 +227,15 @@
     const auth = getAuth(app);
     const gProvider = new GoogleAuthProvider();
 
-    // Si ya tiene sesión activa → directo al home
+    // Si ya tiene sesión activa → saltar el login directo al home
     onAuthStateChanged(auth, user => {
-      document.getElementById("checking").style.display = "none";
-      if (user) {
-        window.location.href = "index.html";
-      } else {
-        document.getElementById("login-page").style.display = "grid";
-      }
+      if (user) window.location.replace("home.html");
     });
 
     const errEl   = document.getElementById("login-error");
     const showErr = msg => { errEl.textContent=msg; errEl.style.display="block"; };
 
-    // Google
+    // Google → después del login onAuthStateChanged lo manda a home.html
     document.getElementById("btn-google").onclick = async () => {
       try { await signInWithPopup(auth, gProvider); }
       catch(e) { showErr("Error con Google. Intenta de nuevo."); }
@@ -306,14 +251,14 @@
         : `¿Prefieres correo? <span>Ingresa con email →</span>`;
     };
 
-    // Login email
+    // Email login
     document.getElementById("btn-email-login").onclick = async () => {
       const email = document.getElementById("login-email").value.trim();
       const pass  = document.getElementById("login-password").value;
       errEl.style.display = "none";
-      if (!email||!pass) { showErr("Ingresa tu correo y contraseña."); return; }
+      if(!email||!pass){ showErr("Ingresa tu correo y contraseña."); return; }
       try { await signInWithEmailAndPassword(auth, email, pass); }
-      catch(e) {
+      catch(e){
         if(e.code==="auth/user-not-found") showErr("No encontramos esa cuenta. ¿Quieres crearla?");
         else showErr("Correo o contraseña incorrectos.");
       }
@@ -324,12 +269,13 @@
       const email = document.getElementById("login-email").value.trim();
       const pass  = document.getElementById("login-password").value;
       errEl.style.display = "none";
-      if (!email||!pass) { showErr("Ingresa correo y contraseña."); return; }
-      if (pass.length<6) { showErr("La contraseña debe tener mínimo 6 caracteres."); return; }
+      if(!email||!pass){ showErr("Ingresa correo y contraseña."); return; }
+      if(pass.length<6){ showErr("La contraseña debe tener mínimo 6 caracteres."); return; }
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
         await updateProfile(cred.user, { displayName: email.split("@")[0] });
-      } catch(e) {
+        // onAuthStateChanged lo manda a home.html automáticamente
+      } catch(e){
         if(e.code==="auth/email-already-in-use") showErr("Ese correo ya tiene cuenta. Inicia sesión.");
         else showErr("Error al crear cuenta. Intenta de nuevo.");
       }
@@ -338,10 +284,9 @@
     // Invitada
     document.getElementById("btn-guest").onclick = () => {
       sessionStorage.setItem("wsn-guest","true");
-      window.location.href = "index.html";
+      window.location.replace("home.html");
     };
 
-    // Enter en password
     document.getElementById("login-password")?.addEventListener("keydown", e => {
       if(e.key==="Enter") document.getElementById("btn-email-login").click();
     });
