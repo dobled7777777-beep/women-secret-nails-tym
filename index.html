@@ -6,302 +6,45 @@
   <title>Women Secret Nails</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    /* ── Navbar con usuario ── */
-    .user-nav {
-      display: flex; align-items: center; gap: 12px;
-    }
-    .user-avatar {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: var(--rose-pale); border: 2px solid var(--rose-soft);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; overflow: hidden; cursor: pointer;
-      transition: border-color var(--transition); text-decoration: none;
-      color: var(--rose-deep); font-weight: 600;
-    }
-    .user-avatar:hover { border-color: var(--rose-deep); }
-    .user-avatar img { width:100%; height:100%; object-fit:cover; }
-    .user-display-name {
-      font-size: 13px; color: var(--text-mid); font-weight: 400;
-    }
-    @media(max-width:480px){ .user-display-name { display:none; } }
-
-    /* ── Hero ── */
-    .hero {
-      position: relative; z-index: 1;
-      min-height: calc(100vh - 68px);
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-      text-align: center;
-      padding: 60px clamp(20px,5vw,60px) 40px;
-    }
-    .hero-eyebrow {
-      display: flex; align-items: center; gap: 14px;
-      font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
-      color: var(--text-light); margin-bottom: 32px;
-      opacity: 0; animation: fadeUp 0.7s 0.1s forwards;
-    }
-    .eyebrow-line { display:block; width:40px; height:1px; background:var(--rose); }
-
-    .hero-title {
-      font-family: var(--font-display);
-      font-size: clamp(72px,12vw,160px);
-      font-weight: 300; line-height: 0.92;
-      color: var(--text-dark); margin-bottom: 32px;
-      opacity: 0; animation: fadeUp 0.8s 0.25s forwards;
-    }
-    .hero-title em { font-style:italic; color:var(--rose-deep); }
-
-    .hero-sub {
-      font-size: 15px; font-weight: 300; line-height: 1.8;
-      color: var(--text-mid); max-width: 360px; margin-bottom: 48px;
-      opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
-    }
-
-    .hero-actions {
-      display: flex; gap: 16px; flex-wrap: wrap;
+    body {
+      display: flex;
+      align-items: center;
       justify-content: center;
-      opacity: 0; animation: fadeUp 0.8s 0.55s forwards;
+      min-height: 100vh;
+      background: var(--cream);
+      flex-direction: column;
+      gap: 16px;
     }
-
-    /* Saludo personalizado */
-    .hero-greeting {
-      font-size: 13px; color: var(--text-light); font-weight: 300;
-      margin-bottom: 8px; letter-spacing: 0.05em;
-      opacity: 0; animation: fadeUp 0.7s 0.05s forwards;
-    }
-
-    /* Badges flotantes */
-    .floating-badge {
-      position: absolute;
-      display: flex; align-items: center; gap: 10px;
-      background: white; border: 1px solid rgba(212,184,150,0.3);
-      border-radius: var(--radius-md); padding: 12px 18px;
-      box-shadow: var(--shadow-card);
-      opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
-    }
-    .floating-badge--left  { bottom:140px; left:clamp(20px,6vw,80px); }
-    .floating-badge--right { bottom:140px; right:clamp(20px,6vw,80px); }
-    @media(max-width:700px){ .floating-badge { display:none; } }
-
-    .badge-num {
-      font-family: var(--font-display); font-size: 28px;
-      font-weight: 600; color: var(--rose-deep); line-height: 1;
-    }
-    .badge-label {
-      font-size: 11px; color: var(--text-light);
-      letter-spacing: 0.05em; line-height: 1.4;
-    }
-
-    /* Franja animada */
-    .highlight-strip {
-      position: relative; z-index: 1;
-      border-top: 1px solid rgba(232,164,176,0.25);
-      border-bottom: 1px solid rgba(232,164,176,0.25);
-      background: rgba(245,213,220,0.12);
-      padding: 14px 0; overflow: hidden;
-    }
-    .strip-inner {
-      display: flex; gap: 24px; align-items: center;
-      font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--text-mid); white-space: nowrap;
-      animation: scrollStrip 22s linear infinite;
-      width: max-content;
-    }
-    .dot { color: var(--rose); font-size: 18px; line-height: 1; }
-    @keyframes scrollStrip {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-
-    /* Sección "Por qué nosotras" */
-    .why-section {
-      position: relative; z-index: 1;
-      max-width: 1100px; margin: 80px auto;
-      padding: 0 clamp(20px,5vw,60px);
-      text-align: center;
-    }
-    .why-eyebrow {
-      font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
-      color: var(--text-light); margin-bottom: 12px;
-    }
-    .why-title {
+    .gate-logo {
       font-family: var(--font-display);
-      font-size: clamp(32px,5vw,56px); font-weight: 300;
-      color: var(--text-dark); margin-bottom: 48px;
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--rose-deep);
+      letter-spacing: 0.12em;
+      opacity: 0;
+      animation: fadeUp 0.5s 0.1s forwards;
     }
-    .why-title em { font-style:italic; color:var(--rose-deep); }
-    .why-grid {
-      display: grid; grid-template-columns: repeat(3,1fr);
-      gap: 28px;
+    .gate-spinner {
+      opacity: 0;
+      animation: fadeUp 0.5s 0.3s forwards;
     }
-    @media(max-width:600px){ .why-grid { grid-template-columns: 1fr; } }
-
-    .why-card {
-      background: white; border-radius: var(--radius-lg);
-      padding: 36px 28px; text-align: center;
-      box-shadow: var(--shadow-card);
-      border: 1px solid rgba(212,184,150,0.15);
-      transition: transform var(--transition), box-shadow var(--transition);
-    }
-    .why-card:hover { transform:translateY(-6px); box-shadow:0 12px 40px rgba(44,31,34,0.1); }
-    .why-icon { font-size: 40px; margin-bottom: 16px; }
-    .why-card-title {
-      font-family: var(--font-display); font-size: 22px;
-      font-weight: 400; color: var(--text-dark); margin-bottom: 10px;
-    }
-    .why-card-desc {
-      font-size: 13px; color: var(--text-light);
-      font-weight: 300; line-height: 1.7;
-    }
-
-    /* CTA final */
-    .cta-section {
-      position: relative; z-index: 1;
-      text-align: center;
-      padding: 60px clamp(20px,5vw,60px) 100px;
-    }
-    .cta-box {
-      max-width: 560px; margin: 0 auto;
-      background: linear-gradient(135deg, #2c1f22, #c97b8a);
-      border-radius: var(--radius-xl);
-      padding: 60px 48px;
-      position: relative; overflow: hidden;
-    }
-    .cta-box::before {
-      content: '💅';
-      position: absolute; right: 32px; top: 24px;
-      font-size: 80px; opacity: 0.12; user-select: none;
-    }
-    .cta-box h2 {
-      font-family: var(--font-display);
-      font-size: clamp(28px,4vw,44px); font-weight: 300;
-      color: white; margin-bottom: 14px;
-    }
-    .cta-box h2 em { font-style:italic; color:var(--rose-soft); }
-    .cta-box p {
-      font-size: 14px; color: rgba(255,255,255,0.7);
-      margin-bottom: 32px; font-weight: 300; line-height: 1.7;
-    }
-    .btn-white {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: white; color: var(--rose-deep);
-      font-family: var(--font-body); font-size: 13px; font-weight: 500;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      padding: 14px 32px; border-radius: var(--radius-xl);
-      border: none; cursor: pointer; text-decoration: none;
-      transition: transform var(--transition), box-shadow var(--transition);
-    }
-    .btn-white:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.2); }
   </style>
 </head>
-<body class="home-page">
-
+<body>
   <div class="bg-orb bg-orb--1"></div>
   <div class="bg-orb bg-orb--2"></div>
-  <div class="bg-orb bg-orb--3"></div>
-
-  <!-- Header con navbar completo -->
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="logo-mark">WSN</div>
-      <nav class="header-nav">
-        <a href="services.html">Servicios</a>
-        <a href="careers.html">Trabaja con nosotras</a>
-        <!-- Se llena por JS -->
-        <div id="user-nav-slot"></div>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Hero -->
-  <main class="hero">
-    <p class="hero-greeting" id="hero-greeting"></p>
-
-    <div class="hero-eyebrow">
-      <span class="eyebrow-line"></span>
-      <span>Spa de uñas · Bogotá</span>
-      <span class="eyebrow-line"></span>
-    </div>
-
-    <h1 class="hero-title">
-      Women<br><em>Secret</em><br>Nails
-    </h1>
-
-    <p class="hero-sub">
-      Donde cada detalle es una obra de arte.<br>
-      Reserva tu cita en segundos.
-    </p>
-
-    <div class="hero-actions">
-      <a href="services.html" class="btn-primary">Ver servicios</a>
-      <a href="services.html" class="btn-ghost">Agendar cita →</a>
-    </div>
-
-    <div class="floating-badge floating-badge--left">
-      <span class="badge-num">9+</span>
-      <span class="badge-label">servicios<br>disponibles</span>
-    </div>
-    <div class="floating-badge floating-badge--right">
-      <span class="badge-num">💅</span>
-      <span class="badge-label">reserva<br>online</span>
-    </div>
-  </main>
-
-  <!-- Franja animada -->
-  <section class="highlight-strip">
-    <div class="strip-inner">
-      <span>Manicura</span><span class="dot">·</span>
-      <span>Acrílicas</span><span class="dot">·</span>
-      <span>Semipermanente</span><span class="dot">·</span>
-      <span>Pedicura</span><span class="dot">·</span>
-      <span>Cejas en Henna</span><span class="dot">·</span>
-      <span>Press On</span><span class="dot">·</span>
-      <span>Cepillado</span><span class="dot">·</span>
-      <span>Manicura</span><span class="dot">·</span>
-      <span>Acrílicas</span><span class="dot">·</span>
-      <span>Semipermanente</span><span class="dot">·</span>
-    </div>
-  </section>
-
-  <!-- Por qué nosotras -->
-  <section class="why-section">
-    <p class="why-eyebrow">¿Por qué elegirnos?</p>
-    <h2 class="why-title">Arte, cuidado y <em>estilo</em></h2>
-    <div class="why-grid">
-      <div class="why-card">
-        <div class="why-icon">💅</div>
-        <h3 class="why-card-title">Especialistas en uñas</h3>
-        <p class="why-card-desc">Técnicas profesionales con productos de la más alta calidad para resultados que duran.</p>
-      </div>
-      <div class="why-card">
-        <div class="why-icon">📅</div>
-        <h3 class="why-card-title">Reserva en segundos</h3>
-        <p class="why-card-desc">Elige tu servicio, horario y método de pago desde tu celular sin llamadas ni esperas.</p>
-      </div>
-      <div class="why-card">
-        <div class="why-icon">🌸</div>
-        <h3 class="why-card-title">Atención personalizada</h3>
-        <p class="why-card-desc">Cada clienta es especial. Te atendemos con cariño y te cuidamos en cada detalle.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA final -->
-  <section class="cta-section">
-    <div class="cta-box">
-      <h2>Agenda tu cita<br><em>hoy mismo</em></h2>
-      <p>Elige tu servicio favorito y reserva en menos de 2 minutos.<br>Sin filas, sin llamadas.</p>
-      <a href="services.html" class="btn-white">Ver todos los servicios →</a>
-    </div>
-  </section>
+  <p class="gate-logo">WSN</p>
+  <div class="gate-spinner">
+    <div class="loading-spinner"></div>
+  </div>
 
   <script type="module">
     import { initializeApp, getApps, getApp }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut }
+    import { getAuth, onAuthStateChanged }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -317,37 +60,14 @@
     const auth = getAuth(app);
     const isGuest = sessionStorage.getItem("wsn-guest") === "true";
 
+    // Una sola decisión: ¿tiene sesión? → home. ¿no? → login
     onAuthStateChanged(auth, user => {
-      // Si no hay sesión Y no es invitada → al login
-      if (!user && !isGuest) {
-        window.location.href = "login.html"; return;
-      }
-      renderNav(user);
-    });
-
-    function renderNav(user) {
-      const slot    = document.getElementById("user-nav-slot");
-      const greeting= document.getElementById("hero-greeting");
-
-      if (user) {
-        const name = user.displayName || user.email.split("@")[0];
-        greeting.textContent = `Hola de nuevo, ${name} 👋`;
-        slot.innerHTML = `
-          <a href="profile.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
-            <span class="user-display-name">${name}</span>
-            <div class="user-avatar">
-              ${user.photoURL
-                ? `<img src="${user.photoURL}" alt="${name}">`
-                : name.charAt(0).toUpperCase()}
-            </div>
-          </a>`;
+      if (user || isGuest) {
+        window.location.replace("home.html");
       } else {
-        // Invitada
-        greeting.textContent = "Bienvenida 💅";
-        slot.innerHTML = `
-          <a href="login.html" class="nav-cta">Iniciar sesión</a>`;
+        window.location.replace("login.html");
       }
-    }
+    });
   </script>
 </body>
 </html>
