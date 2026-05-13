@@ -1,15 +1,15 @@
 // =====================================================
-// js/services.js — con Auth de clientes
-// ✅ Verifica si hay sesión activa o invitada
-// ✅ Auto-rellena nombre si el cliente está logueado
-// ✅ Muestra avatar + nombre en el header
-// ✅ 5 pasos completos con todos los campos
+// js/services.js — TIEMPO REAL con onSnapshot
+// ✅ Servicios se actualizan en vivo desde Firestore
+// ✅ Slots de horarios en tiempo real
+// ✅ Auth de clientes + auto-relleno de nombre
+// ✅ 5 pasos completos
 // =====================================================
 
 import { db } from "./firebase-config.js";
 import {
-  collection, getDocs, addDoc,
-  query, where, serverTimestamp
+  collection, addDoc, query, where,
+  onSnapshot, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 import { getAuth, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
@@ -29,17 +29,16 @@ const EMOJIS = {
   "manicura tradicional":"🌸","manicura + pedicura":"🌸",
   "press on":"🎀","press-on":"🎀","pedicura tradicional":"🦶",
 };
-const emoji = n => EMOJIS[n?.toLowerCase().trim()] || "💅";
-
+const emoji    = n => EMOJIS[n?.toLowerCase().trim()] || "💅";
 const fmtPrice = p => {
   if (!p) return "Consultar";
-  const n = parseInt(String(p).replace(/\D/g,""),10);
-  return isNaN(n) ? p : "$"+n.toLocaleString("es-CO");
+  const n = parseInt(String(p).replace(/\D/g,""), 10);
+  return isNaN(n) ? p : "$" + n.toLocaleString("es-CO");
 };
 const fmtDate = s => {
   if (!s) return "—";
   const [y,m,d] = s.split("-");
-  const M=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  const M = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
   return `${parseInt(d)} de ${M[parseInt(m)-1]} de ${y}`;
 };
 const fmtTime = t => {
@@ -50,17 +49,17 @@ const fmtTime = t => {
 
 // ─── Slots ────────────────────────────────────────────────────────────────────
 function genSlots() {
-  const s=[]; let h=BUSINESS.openHour, m=BUSINESS.openMinute;
-  while(h<BUSINESS.closeHour||(h===BUSINESS.closeHour&&m<BUSINESS.closeMinute)){
+  const s = []; let h = BUSINESS.openHour, m = BUSINESS.openMinute;
+  while (h < BUSINESS.closeHour || (h === BUSINESS.closeHour && m < BUSINESS.closeMinute)) {
     s.push(`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`);
-    m+=BUSINESS.slotStep; if(m>=60){m-=60;h++;}
+    m += BUSINESS.slotStep; if (m >= 60) { m -= 60; h++; }
   }
   return s;
 }
-const toMin = t => { const [h,m]=t.split(":").map(Number); return h*60+m; };
-const isBlocked = (slot,res) => res.some(r=>{
-  const s=toMin(r.time),e=s+(r.duration||30);
-  return toMin(slot)>=s&&toMin(slot)<e;
+const toMin     = t => { const [h,m] = t.split(":").map(Number); return h*60+m; };
+const isBlocked = (slot, res) => res.some(r => {
+  const s = toMin(r.time), e = s + (r.duration || 30);
+  return toMin(slot) >= s && toMin(slot) < e;
 });
 
 // ─── Estado global ────────────────────────────────────────────────────────────
@@ -72,15 +71,18 @@ const bk = {
   payment:null,
 };
 
-let currentUser = null;
-const isGuest   = sessionStorage.getItem("wsn-guest") === "true";
+let currentUser      = null;
+let staffMembers     = [];
+let unsubServices    = null;   // listener de servicios
+let unsubSlots       = null;   // listener de slots por fecha
+const isGuest        = sessionStorage.getItem("wsn-guest") === "true";
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ── Guard: si no hay sesión ni invitado → al login ────────────────────────
+  // ── Guard auth ────────────────────────────────────────────────────────────
+  const auth = getAuth();
   if (!isGuest) {
-    const auth = getAuth();
     onAuthStateChanged(auth, user => {
       if (!user) {
         window.location.href = "index.html";
@@ -100,9 +102,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalTitle = document.getElementById("modal-service-name");
   const modalMeta  = document.getElementById("modal-service-meta");
 
-  const TOTAL = 5;
-  const stepEls  = Array.from({length:TOTAL},(_,i)=>document.getElementById(`step-${i+1}`));
-  const stepDots = Array.from({length:TOTAL},(_,i)=>document.getElementById(`step-dot-${i+1}`));
+  const TOTAL   = 5;
+  const stepEls  = Array.from({length:TOTAL}, (_,i) => document.getElementById(`step-${i+1}`));
+  const stepDots = Array.from({length:TOTAL}, (_,i) => document.getElementById(`step-dot-${i+1}`));
   const stepOk   = document.getElementById("step-success");
 
   const dateInput   = document.getElementById("reservation-date");
@@ -121,222 +123,313 @@ document.addEventListener("DOMContentLoaded", () => {
   const sumPayment    = document.getElementById("summary-payment");
   const sumPrice      = document.getElementById("summary-price");
 
-  let staffMembers = [];
-
-  // Fecha mínima hoy
+  // Fecha mínima
   const now = new Date();
   dateInput.min = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
 
-  // ── Cargar staff ───────────────────────────────────────────────────────────
-  async function loadStaff() {
-    try {
-      const snap = await getDocs(query(collection(db,"staff"),where("active","==",true)));
-      staffMembers = snap.docs.map(d=>({id:d.id,...d.data()}));
-    } catch(e) { staffMembers=[]; }
-  }
+  // ══════════════════════════════════════════════════════════════════════════
+  // ✅ TIEMPO REAL — Servicios con onSnapshot
+  // Se actualiza automáticamente cuando admin edita servicios en Firebase
+  // ══════════════════════════════════════════════════════════════════════════
+  function subscribeServices() {
+    // Cancelar listener anterior si existe
+    if (unsubServices) unsubServices();
 
-  // ── Cargar servicios ───────────────────────────────────────────────────────
-  async function loadServices() {
-    try {
-      const snap = await getDocs(query(collection(db,"services"),where("active","==",true)));
-      grid.innerHTML="";
-      if(snap.empty){ grid.innerHTML=`<p class="empty-msg">No hay servicios disponibles.</p>`; return; }
-      snap.forEach(doc=>{
-        const d=doc.data();
-        const name=d.name||"Servicio", price=d.price||"", dur=d.duration||30, img=d.image||"";
-        const card=document.createElement("div");
-        card.className="card";
-        card.innerHTML=`
+    grid.innerHTML = `<div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Cargando servicios...</p>
+    </div>`;
+
+    const q = query(collection(db, "services"), where("active", "==", true));
+
+    unsubServices = onSnapshot(q, snap => {
+      grid.innerHTML = "";
+
+      if (snap.empty) {
+        grid.innerHTML = `<p class="empty-msg">No hay servicios disponibles.</p>`;
+        return;
+      }
+
+      // Ordenar por nombre para consistencia visual
+      const docs = [...snap.docs].sort((a,b) =>
+        (a.data().name || "").localeCompare(b.data().name || "")
+      );
+
+      docs.forEach((docSnap, i) => {
+        const d    = docSnap.data();
+        const name = d.name || "Servicio";
+        const card = document.createElement("div");
+        card.className = "card";
+        card.style.animationDelay = `${i * 0.06}s`;
+
+        // 3D tilt effect por JS
+        card.addEventListener("mousemove", e => {
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width  - 0.5;
+          const y = (e.clientY - r.top)  / r.height - 0.5;
+          card.style.transform = `perspective(600px) rotateY(${x*8}deg) rotateX(${-y*6}deg) translateY(-6px)`;
+          card.style.boxShadow = `${-x*8}px ${-y*6}px 30px rgba(201,123,138,0.18), 0 12px 40px rgba(44,31,34,0.1)`;
+        });
+        card.addEventListener("mouseleave", () => {
+          card.style.transform = "";
+          card.style.boxShadow = "";
+        });
+
+        card.innerHTML = `
           <div class="card-image-wrap">
-            ${img?`<img src="${img}" alt="${name}" loading="lazy">`:`<div class="card-placeholder">${emoji(name)}</div>`}
+            ${d.image
+              ? `<img src="${d.image}" alt="${name}" loading="lazy">`
+              : `<div class="card-placeholder">${emoji(name)}</div>`}
           </div>
           <div class="card-body">
             <h3 class="card-name">${name}</h3>
             <div class="card-meta">
-              <span class="card-price">${fmtPrice(price)}</span>
-              ${dur?`<span class="card-sep"></span><span class="card-duration">~${dur} min</span>`:""}
+              <span class="card-price">${fmtPrice(d.price)}</span>
+              ${d.duration ? `<span class="card-sep"></span><span class="card-duration">~${d.duration} min</span>` : ""}
             </div>
             <button class="card-btn">Reservar</button>
           </div>`;
+
         grid.appendChild(card);
-        card.querySelector(".card-btn").onclick=()=>openModal(doc.id,name,price,dur);
+        card.querySelector(".card-btn").onclick = () =>
+          openModal(docSnap.id, name, d.price, d.duration);
       });
-    } catch(e){
-      grid.innerHTML=`<p class="empty-msg" style="color:var(--rose-deep)">Error cargando servicios.</p>`;
-    }
-  }
 
-  // ── Abrir modal ────────────────────────────────────────────────────────────
-  function openModal(id,name,price,duration){
-    Object.assign(bk,{
-      serviceId:id,serviceName:name,servicePrice:price,
-      serviceDuration:Number(duration)||30,
-      date:null,time:null,specialist:null,specialistId:null,
-      clientName:null,clientPhone:null,payment:null,
+    }, err => {
+      console.error("Error servicios:", err);
+      grid.innerHTML = `<p class="empty-msg" style="color:var(--rose-deep)">Error cargando servicios. Recarga la página.</p>`;
     });
-    modalTitle.textContent=name;
-    modalMeta.textContent=`${fmtPrice(price)} · ~${duration} min`;
-    dateInput.value="";
-    timeSlotsEl.innerHTML=`<p class="slots-hint">Selecciona una fecha para ver los horarios.</p>`;
-
-    // Auto-rellenar nombre si está logueada
-    if(currentUser){
-      nameInput.value = currentUser.displayName || currentUser.email.split("@")[0];
-    } else {
-      nameInput.value="";
-    }
-    phoneInput.value="";
-    document.querySelectorAll("input[name='payment']").forEach(r=>r.checked=false);
-    goTo(1);
-    modal.style.display="flex";
-    document.body.style.overflow="hidden";
   }
 
-  function closeModal(){ modal.style.display="none"; document.body.style.overflow=""; }
-  closeBtn?.addEventListener("click",closeModal);
-  backdrop?.addEventListener("click",closeModal);
-  closeOk?.addEventListener("click",closeModal);
+  // ── Cargar staff (una sola vez es suficiente) ──────────────────────────────
+  function subscribeStaff() {
+    const q = query(collection(db, "staff"), where("active", "==", true));
+    onSnapshot(q, snap => {
+      staffMembers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    });
+  }
 
-  // ── Cambio de fecha → slots ────────────────────────────────────────────────
-  dateInput?.addEventListener("change", async ()=>{
-    const date=dateInput.value; if(!date) return;
-    bk.date=date; bk.time=null;
-    timeSlotsEl.innerHTML=`<div class="slots-loading">
+  // ══════════════════════════════════════════════════════════════════════════
+  // ✅ TIEMPO REAL — Slots por fecha con onSnapshot
+  // Si otra clienta agenda mientras estás eligiendo, el slot desaparece solo
+  // ══════════════════════════════════════════════════════════════════════════
+  function subscribeSlots(date) {
+    // Cancelar listener de fecha anterior
+    if (unsubSlots) { unsubSlots(); unsubSlots = null; }
+
+    timeSlotsEl.innerHTML = `<div class="slots-loading">
       <div class="loading-spinner" style="width:20px;height:20px;margin:0 auto 8px;"></div>
-      <p>Verificando disponibilidad...</p></div>`;
-    try {
-      const snap=await getDocs(query(
-        collection(db,"reservations"),
-        where("date","==",date),
-        where("status","in",["pendiente","confirmada"])
-      ));
-      renderSlots(snap.docs.map(d=>({time:d.data().time,duration:d.data().duration||30})));
-    } catch(e){
-      timeSlotsEl.innerHTML=`<p class="slots-hint" style="color:var(--rose-deep)">Error verificando horarios.</p>`;
-    }
-  });
+      <p>Verificando disponibilidad en tiempo real...</p>
+    </div>`;
 
-  function renderSlots(reserved){
-    const all=genSlots();
-    const n=new Date();
-    const todayStr=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
-    const isToday=bk.date===todayStr;
-    const nowMin=n.getHours()*60+n.getMinutes();
-    const closeMin=BUSINESS.closeHour*60+BUSINESS.closeMinute;
-    timeSlotsEl.innerHTML="";
-    let any=false;
-    all.forEach(slot=>{
-      const sm=toMin(slot);
-      const ok=(sm+bk.serviceDuration)<=closeMin&&!(isToday&&sm<=nowMin+30)&&!isBlocked(slot,reserved);
-      const btn=document.createElement("button");
-      btn.className="time-slot"; btn.dataset.time=slot; btn.textContent=fmtTime(slot);
-      if(!ok){btn.classList.add("taken");btn.disabled=true;}else any=true;
+    const q = query(
+      collection(db, "reservations"),
+      where("date",   "==", date),
+      where("status", "in", ["pendiente", "confirmada"])
+    );
+
+    unsubSlots = onSnapshot(q, snap => {
+      const reserved = snap.docs.map(d => ({
+        time:     d.data().time,
+        duration: d.data().duration || 30,
+      }));
+      renderSlots(reserved);
+
+      // Si el slot actualmente seleccionado fue tomado, deseleccionar
+      if (bk.time && isBlocked(bk.time, reserved)) {
+        bk.time = null;
+        const sel = timeSlotsEl.querySelector(".time-slot.selected");
+        if (sel) sel.classList.remove("selected");
+        showToast("El horario que elegiste acaba de ser reservado 💨 Elige otro.");
+      }
+    }, err => {
+      console.error("Error slots:", err);
+    });
+  }
+
+  function renderSlots(reserved) {
+    const all = genSlots();
+    const n   = new Date();
+    const todayStr = `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
+    const isToday  = bk.date === todayStr;
+    const nowMin   = n.getHours() * 60 + n.getMinutes();
+    const closeMin = BUSINESS.closeHour * 60 + BUSINESS.closeMinute;
+
+    timeSlotsEl.innerHTML = "";
+    let any = false;
+
+    all.forEach(slot => {
+      const sm = toMin(slot);
+      const ok = (sm + bk.serviceDuration) <= closeMin
+               && !(isToday && sm <= nowMin + 30)
+               && !isBlocked(slot, reserved);
+
+      const btn = document.createElement("button");
+      btn.className        = "time-slot";
+      btn.dataset.time     = slot;
+      btn.textContent      = fmtTime(slot);
+      if (slot === bk.time) btn.classList.add("selected"); // preservar selección
+      if (!ok) { btn.classList.add("taken"); btn.disabled = true; }
+      else any = true;
       timeSlotsEl.appendChild(btn);
     });
-    if(!any){
-      const p=document.createElement("p");
-      p.className="slots-hint"; p.textContent="No hay horarios disponibles este día.";
+
+    if (!any) {
+      const p = document.createElement("p");
+      p.className   = "slots-hint";
+      p.textContent = "No hay horarios disponibles este día.";
       timeSlotsEl.appendChild(p);
     }
   }
 
-  timeSlotsEl?.addEventListener("click",e=>{
-    const slot=e.target.closest(".time-slot");
-    if(!slot||slot.disabled) return;
-    document.querySelectorAll(".time-slot").forEach(s=>s.classList.remove("selected"));
-    slot.classList.add("selected"); bk.time=slot.dataset.time;
+  // ── Abrir modal ────────────────────────────────────────────────────────────
+  function openModal(id, name, price, duration) {
+    Object.assign(bk, {
+      serviceId:id, serviceName:name, servicePrice:price,
+      serviceDuration:Number(duration) || 30,
+      date:null, time:null,
+      specialist:null, specialistId:null,
+      clientName:null, clientPhone:null, payment:null,
+    });
+    modalTitle.textContent = name;
+    modalMeta.textContent  = `${fmtPrice(price)} · ~${duration} min`;
+    dateInput.value        = "";
+    timeSlotsEl.innerHTML  = `<p class="slots-hint">Selecciona una fecha para ver los horarios.</p>`;
+    if (unsubSlots) { unsubSlots(); unsubSlots = null; }
+
+    // Auto-rellenar si está logueada
+    nameInput.value  = currentUser ? (currentUser.displayName || currentUser.email.split("@")[0]) : "";
+    phoneInput.value = "";
+    document.querySelectorAll("input[name='payment']").forEach(r => r.checked = false);
+    goTo(1);
+    modal.style.display       = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    if (unsubSlots) { unsubSlots(); unsubSlots = null; }
+    modal.style.display          = "none";
+    document.body.style.overflow = "";
+  }
+
+  closeBtn?.addEventListener("click", closeModal);
+  backdrop?.addEventListener("click", closeModal);
+  closeOk?.addEventListener("click", closeModal);
+
+  // ── Cambio de fecha ────────────────────────────────────────────────────────
+  dateInput?.addEventListener("change", () => {
+    const date = dateInput.value;
+    if (!date) return;
+    bk.date = date;
+    bk.time = null;
+    subscribeSlots(date);   // ✅ listener en tiempo real
+  });
+
+  timeSlotsEl?.addEventListener("click", e => {
+    const slot = e.target.closest(".time-slot");
+    if (!slot || slot.disabled) return;
+    document.querySelectorAll(".time-slot").forEach(s => s.classList.remove("selected"));
+    slot.classList.add("selected");
+    bk.time = slot.dataset.time;
   });
 
   // ── Staff ──────────────────────────────────────────────────────────────────
-  function renderStaff(){
-    if(!staffListEl) return;
-    staffListEl.innerHTML="";
-    if(!staffMembers.length){
-      staffListEl.innerHTML=`<p class="slots-hint">No hay especialistas disponibles.</p>`; return;
+  function renderStaff() {
+    if (!staffListEl) return;
+    staffListEl.innerHTML = "";
+    if (!staffMembers.length) {
+      staffListEl.innerHTML = `<p class="slots-hint">No hay especialistas disponibles.</p>`;
+      return;
     }
-    staffMembers.forEach(m=>{
-      const lbl=document.createElement("label");
-      lbl.className="staff-option";
-      lbl.innerHTML=`
+    staffMembers.forEach(m => {
+      const lbl = document.createElement("label");
+      lbl.className = "staff-option";
+      lbl.innerHTML = `
         <input type="radio" name="specialist" value="${m.id}" style="display:none;">
         <div class="staff-card">
           <div class="staff-avatar">
-            ${m.photo?`<img src="${m.photo}" alt="${m.name}">`:`<span>${m.name.charAt(0)}</span>`}
+            ${m.photo ? `<img src="${m.photo}" alt="${m.name}">` : `<span>${m.name.charAt(0)}</span>`}
           </div>
           <div class="staff-info">
             <span class="staff-name">${m.name}</span>
-            <span class="staff-role">${m.role||"Especialista"}</span>
+            <span class="staff-role">${m.role || "Especialista"}</span>
           </div>
           <div class="staff-check">✓</div>
         </div>`;
       staffListEl.appendChild(lbl);
-      lbl.querySelector("input").onchange=()=>{
-        document.querySelectorAll(".staff-card").forEach(c=>c.classList.remove("selected"));
+      lbl.querySelector("input").onchange = () => {
+        document.querySelectorAll(".staff-card").forEach(c => c.classList.remove("selected"));
         lbl.querySelector(".staff-card").classList.add("selected");
-        bk.specialist=m.name; bk.specialistId=m.id;
+        bk.specialist = m.name; bk.specialistId = m.id;
       };
     });
-    if(staffMembers.length===1){
-      const r=staffListEl.querySelector("input");
-      if(r){ r.checked=true; staffListEl.querySelector(".staff-card").classList.add("selected");
-        bk.specialist=staffMembers[0].name; bk.specialistId=staffMembers[0].id; }
+    if (staffMembers.length === 1) {
+      const r = staffListEl.querySelector("input");
+      if (r) {
+        r.checked = true;
+        staffListEl.querySelector(".staff-card").classList.add("selected");
+        bk.specialist = staffMembers[0].name;
+        bk.specialistId = staffMembers[0].id;
+      }
     }
   }
 
   // ── Navegación ─────────────────────────────────────────────────────────────
-  function goTo(n){
-    stepEls.forEach((s,i)=>s?.classList.toggle("hidden",i+1!==n));
+  function goTo(n) {
+    stepEls.forEach((s, i) => s?.classList.toggle("hidden", i+1 !== n));
     stepOk?.classList.add("hidden");
-    stepDots.forEach((d,i)=>{
-      d?.classList.remove("active","done");
-      if(i+1===n) d?.classList.add("active");
-      if(i+1<n)  d?.classList.add("done");
+    stepDots.forEach((d, i) => {
+      d?.classList.remove("active", "done");
+      if (i+1 === n) d?.classList.add("active");
+      if (i+1 < n)  d?.classList.add("done");
     });
-    if(n===2) renderStaff();
+    if (n === 2) renderStaff();
   }
 
-  document.getElementById("next-step-2")?.addEventListener("click",()=>{
-    if(!bk.date){shake(dateInput);return;}
-    if(!bk.time){shake(timeSlotsEl);return;}
+  document.getElementById("next-step-2")?.addEventListener("click", () => {
+    if (!bk.date)  { shake(dateInput);   return; }
+    if (!bk.time)  { shake(timeSlotsEl); return; }
     goTo(2);
   });
-  document.getElementById("back-step-1")?.addEventListener("click",()=>goTo(1));
+  document.getElementById("back-step-1")?.addEventListener("click", () => goTo(1));
 
-  document.getElementById("next-step-3")?.addEventListener("click",()=>{
-    if(!bk.specialist){shake(staffListEl);return;}
+  document.getElementById("next-step-3")?.addEventListener("click", () => {
+    if (!bk.specialist) { shake(staffListEl); return; }
     goTo(3);
   });
-  document.getElementById("back-step-2")?.addEventListener("click",()=>goTo(2));
+  document.getElementById("back-step-2")?.addEventListener("click", () => goTo(2));
 
-  document.getElementById("next-step-4")?.addEventListener("click",()=>{
-    const name=nameInput.value.trim(), phone=phoneInput.value.trim();
-    if(!name){shake(nameInput);return;}
-    if(!phone){shake(phoneInput);return;}
-    bk.clientName=name; bk.clientPhone=phone;
+  document.getElementById("next-step-4")?.addEventListener("click", () => {
+    const name  = nameInput.value.trim();
+    const phone = phoneInput.value.trim();
+    if (!name)  { shake(nameInput);  return; }
+    if (!phone) { shake(phoneInput); return; }
+    bk.clientName = name; bk.clientPhone = phone;
     goTo(4);
   });
-  document.getElementById("back-step-3")?.addEventListener("click",()=>goTo(3));
+  document.getElementById("back-step-3")?.addEventListener("click", () => goTo(3));
 
-  document.getElementById("next-step-5")?.addEventListener("click",()=>{
-    const sel=document.querySelector("input[name='payment']:checked");
-    if(!sel){shake(document.querySelector(".payment-options"));return;}
-    bk.payment=sel.value;
+  document.getElementById("next-step-5")?.addEventListener("click", () => {
+    const sel = document.querySelector("input[name='payment']:checked");
+    if (!sel) { shake(document.querySelector(".payment-options")); return; }
+    bk.payment = sel.value;
     sumService.textContent    = bk.serviceName;
     sumSpecialist.textContent = bk.specialist;
     sumDate.textContent       = fmtDate(bk.date);
     sumTime.textContent       = fmtTime(bk.time);
     sumClient.textContent     = `${bk.clientName} · ${bk.clientPhone}`;
-    sumPayment.textContent    = bk.payment==="efectivo"?"💵 Efectivo":"💳 Virtual";
+    sumPayment.textContent    = bk.payment === "efectivo" ? "💵 Efectivo" : "💳 Virtual";
     sumPrice.textContent      = fmtPrice(bk.servicePrice);
     goTo(5);
   });
-  document.getElementById("back-step-4")?.addEventListener("click",()=>goTo(4));
+  document.getElementById("back-step-4")?.addEventListener("click", () => goTo(4));
 
-  // ── Confirmar ──────────────────────────────────────────────────────────────
-  confirmBtn?.addEventListener("click", async ()=>{
-    confirmBtn.textContent="Guardando..."; confirmBtn.disabled=true;
+  // ── Confirmar reserva ──────────────────────────────────────────────────────
+  confirmBtn?.addEventListener("click", async () => {
+    confirmBtn.textContent = "Guardando...";
+    confirmBtn.disabled   = true;
     try {
-      await addDoc(collection(db,"reservations"),{
+      await addDoc(collection(db, "reservations"), {
         serviceId:    bk.serviceId,
         service:      bk.serviceName,
         duration:     bk.serviceDuration,
@@ -352,28 +445,43 @@ document.addEventListener("DOMContentLoaded", () => {
         status:       "pendiente",
         createdAt:    serverTimestamp(),
       });
-      stepEls.forEach(s=>s?.classList.add("hidden"));
+      stepEls.forEach(s => s?.classList.add("hidden"));
       stepOk?.classList.remove("hidden");
-      stepDots.forEach(d=>{d?.classList.remove("active");d?.classList.add("done");});
-    } catch(e){
+      stepDots.forEach(d => { d?.classList.remove("active"); d?.classList.add("done"); });
+    } catch(e) {
       console.error(e);
       alert("Error al guardar la reserva. Intenta de nuevo.");
     } finally {
-      confirmBtn.textContent="Confirmar cita ✓"; confirmBtn.disabled=false;
+      confirmBtn.textContent = "Confirmar cita ✓";
+      confirmBtn.disabled   = false;
     }
   });
 
+  // ── Toast de notificación ──────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.createElement("div");
+    t.className = "wsn-toast";
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.classList.add("wsn-toast--show"), 10);
+    setTimeout(() => {
+      t.classList.remove("wsn-toast--show");
+      setTimeout(() => t.remove(), 400);
+    }, 4000);
+  }
+
   // ── Shake ──────────────────────────────────────────────────────────────────
-  function shake(el){
-    if(!el) return;
-    el.style.animation="none"; el.offsetHeight;
-    el.style.animation="shake 0.35s ease";
-    el.addEventListener("animationend",()=>{el.style.animation="";},{once:true});
+  function shake(el) {
+    if (!el) return;
+    el.style.animation = "none";
+    el.offsetHeight; // reflow
+    el.style.animation = "shake 0.35s ease";
+    el.addEventListener("animationend", () => { el.style.animation = ""; }, { once: true });
   }
 
   // ── Estilos dinámicos ──────────────────────────────────────────────────────
-  const st=document.createElement("style");
-  st.textContent=`
+  const st = document.createElement("style");
+  st.textContent = `
     @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
     .slots-hint{grid-column:1/-1;font-size:13px;color:var(--text-light);text-align:center;padding:12px 0;font-weight:300}
     .slots-loading{grid-column:1/-1;text-align:center;font-size:12px;color:var(--text-light);padding:12px 0}
@@ -390,11 +498,24 @@ document.addEventListener("DOMContentLoaded", () => {
     .staff-role{font-size:12px;color:var(--text-light);font-weight:300}
     .staff-check{width:24px;height:24px;border-radius:50%;background:var(--rose-deep);color:white;display:none;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
     .staff-card.selected .staff-check{display:flex}
+
+    /* Toast en tiempo real */
+    .wsn-toast{
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+      background:var(--text-dark);color:white;
+      padding:12px 20px;border-radius:var(--radius-xl);
+      font-size:13px;font-weight:400;z-index:9999;
+      transition:transform 0.35s cubic-bezier(0.34,1.2,0.64,1),opacity 0.35s;
+      opacity:0;max-width:90vw;text-align:center;
+      box-shadow:0 8px 32px rgba(44,31,34,0.25);
+    }
+    .wsn-toast--show{transform:translateX(-50%) translateY(0);opacity:1}
   `;
   document.head.appendChild(st);
 
-  loadStaff();
-  loadServices();
+  // ── Iniciar ────────────────────────────────────────────────────────────────
+  subscribeStaff();
+  subscribeServices();   // ✅ Tiempo real activado
 });
 
 // ── Header nav helpers ─────────────────────────────────────────────────────────
