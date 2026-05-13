@@ -9,6 +9,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <style>
+    /* ── 3D Canvas ─────────────────────────────────────────── */
+    #hero-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── User nav ───────────────────────────────────────────── */
     .user-nav { display:flex; align-items:center; gap:12px; }
     .user-avatar {
       width:34px; height:34px; border-radius:50%;
@@ -23,120 +32,228 @@
     .user-display-name { font-size:13px; color:var(--text-mid); font-weight:400; }
     @media(max-width:480px){ .user-display-name { display:none; } }
 
+    /* ── Hero ───────────────────────────────────────────────── */
     .hero {
-      position:relative; z-index:1;
-      min-height:calc(100vh - 68px);
-      display:flex; flex-direction:column;
-      justify-content:center; align-items:center;
-      text-align:center;
-      padding:60px clamp(20px,5vw,60px) 40px;
+      position: relative;
+      z-index: 1;
+      min-height: calc(100vh - 68px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 60px clamp(20px, 5vw, 60px) 40px;
     }
+
     .hero-greeting {
-      font-size:13px; color:var(--text-light); font-weight:300;
-      margin-bottom:8px; letter-spacing:0.05em;
-      opacity:0; animation:fadeUp 0.7s 0.05s forwards;
+      font-size: 13px; color: var(--text-light); font-weight: 300;
+      margin-bottom: 8px; letter-spacing: 0.05em;
+      opacity: 0; animation: fadeUp 0.7s 0.05s forwards;
     }
     .hero-eyebrow {
-      display:flex; align-items:center; gap:14px;
-      font-size:11px; letter-spacing:0.25em; text-transform:uppercase;
-      color:var(--text-light); margin-bottom:32px;
-      opacity:0; animation:fadeUp 0.7s 0.1s forwards;
+      display: flex; align-items: center; gap: 14px;
+      font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--text-light); margin-bottom: 32px;
+      opacity: 0; animation: fadeUp 0.7s 0.1s forwards;
     }
-    .eyebrow-line { display:block; width:40px; height:1px; background:var(--rose); }
-    .hero-title {
-      font-family:var(--font-display);
-      font-size:clamp(72px,12vw,160px);
-      font-weight:300; line-height:0.92;
-      color:var(--text-dark); margin-bottom:32px;
-      opacity:0; animation:fadeUp 0.8s 0.25s forwards;
-    }
-    .hero-title em { font-style:italic; color:var(--rose-deep); }
-    .hero-sub {
-      font-size:15px; font-weight:300; line-height:1.8;
-      color:var(--text-mid); max-width:360px; margin-bottom:48px;
-      opacity:0; animation:fadeUp 0.8s 0.4s forwards;
-    }
-    .hero-actions {
-      display:flex; gap:16px; flex-wrap:wrap; justify-content:center;
-      opacity:0; animation:fadeUp 0.8s 0.55s forwards;
-    }
-    .floating-badge {
-      position:absolute;
-      display:flex; align-items:center; gap:10px;
-      background:white; border:1px solid rgba(212,184,150,0.3);
-      border-radius:var(--radius-md); padding:12px 18px;
-      box-shadow:var(--shadow-card);
-      opacity:0; animation:fadeUp 0.8s 0.8s forwards;
-    }
-    .floating-badge--left  { bottom:140px; left:clamp(20px,6vw,80px); }
-    .floating-badge--right { bottom:140px; right:clamp(20px,6vw,80px); }
-    @media(max-width:700px){ .floating-badge { display:none; } }
-    .badge-num {
-      font-family:var(--font-display); font-size:28px;
-      font-weight:600; color:var(--rose-deep); line-height:1;
-    }
-    .badge-label { font-size:11px; color:var(--text-light); line-height:1.4; }
+    .eyebrow-line { display: block; width: 40px; height: 1px; background: var(--rose); }
 
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(72px, 12vw, 160px);
+      font-weight: 300; line-height: 0.92;
+      color: var(--text-dark); margin-bottom: 32px;
+      opacity: 0; animation: fadeUp 0.8s 0.25s forwards;
+      /* Sutil sombra de texto 3D */
+      text-shadow:
+        2px 2px 0 rgba(201,123,138,0.08),
+        4px 4px 0 rgba(201,123,138,0.04);
+    }
+    .hero-title em { font-style: italic; color: var(--rose-deep); }
+
+    .hero-sub {
+      font-size: 15px; font-weight: 300; line-height: 1.8;
+      color: var(--text-mid); max-width: 360px; margin-bottom: 48px;
+      opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
+    }
+
+    .hero-actions {
+      display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+      opacity: 0; animation: fadeUp 0.8s 0.55s forwards;
+    }
+
+    /* ── Floating badges ────────────────────────────────────── */
+    .floating-badge {
+      position: absolute;
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(212,184,150,0.3);
+      border-radius: var(--radius-md); padding: 12px 18px;
+      box-shadow: var(--shadow-card);
+      opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+      transition: transform 0.3s ease;
+    }
+    .floating-badge:hover { transform: translateY(-4px); }
+    .floating-badge--left  { bottom: 140px; left: clamp(20px, 6vw, 80px); }
+    .floating-badge--right { bottom: 140px; right: clamp(20px, 6vw, 80px); }
+    @media(max-width:700px){ .floating-badge { display: none; } }
+
+    .badge-num {
+      font-family: var(--font-display); font-size: 28px;
+      font-weight: 600; color: var(--rose-deep); line-height: 1;
+    }
+    .badge-label { font-size: 11px; color: var(--text-light); line-height: 1.4; }
+
+    /* ── 3D Feature cards ───────────────────────────────────── */
+    .why-section {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 80px auto;
+      padding: 0 clamp(20px, 5vw, 60px); text-align: center;
+    }
+    .why-eyebrow {
+      font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--text-light); margin-bottom: 12px;
+    }
+    .why-title {
+      font-family: var(--font-display); font-size: clamp(32px, 5vw, 56px);
+      font-weight: 300; color: var(--text-dark); margin-bottom: 48px;
+    }
+    .why-title em { font-style: italic; color: var(--rose-deep); }
+
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    @media(max-width:600px){ .why-grid { grid-template-columns: 1fr; } }
+
+    /* ── 3D card con perspectiva ───────────────────────────── */
+    .why-card-wrapper { perspective: 800px; }
+    .why-card {
+      background: white; border-radius: var(--radius-lg);
+      padding: 36px 28px; text-align: center;
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(212,184,150,0.15);
+      transition: transform 0.5s cubic-bezier(0.34,1.2,0.64,1),
+                  box-shadow 0.5s ease;
+      transform-style: preserve-3d;
+      will-change: transform;
+      cursor: default;
+    }
+    .why-card:hover {
+      box-shadow: 0 20px 60px rgba(201,123,138,0.2),
+                  0 4px 20px rgba(44,31,34,0.08);
+    }
+    .why-icon {
+      font-size: 40px; margin-bottom: 16px;
+      display: inline-block;
+      animation: float3d 3s ease-in-out infinite;
+    }
+    .why-card:nth-child(2) .why-icon { animation-delay: 0.5s; }
+    .why-card:nth-child(3) .why-icon { animation-delay: 1s; }
+
+    @keyframes float3d {
+      0%, 100% { transform: translateY(0) rotateY(0deg); }
+      50%       { transform: translateY(-8px) rotateY(5deg); }
+    }
+
+    .why-card-title {
+      font-family: var(--font-display); font-size: 22px;
+      font-weight: 400; color: var(--text-dark); margin-bottom: 10px;
+    }
+    .why-card-desc {
+      font-size: 13px; color: var(--text-light);
+      font-weight: 300; line-height: 1.7;
+    }
+
+    /* ── Strip ──────────────────────────────────────────────── */
     .highlight-strip {
-      position:relative; z-index:1;
-      border-top:1px solid rgba(232,164,176,0.25);
-      border-bottom:1px solid rgba(232,164,176,0.25);
-      background:rgba(245,213,220,0.12);
-      padding:14px 0; overflow:hidden;
+      position: relative; z-index: 1;
+      border-top: 1px solid rgba(232,164,176,0.25);
+      border-bottom: 1px solid rgba(232,164,176,0.25);
+      background: rgba(245,213,220,0.12);
+      padding: 14px 0; overflow: hidden;
     }
     .strip-inner {
-      display:flex; gap:24px; align-items:center;
-      font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
-      color:var(--text-mid); white-space:nowrap;
-      animation:scrollStrip 22s linear infinite; width:max-content;
+      display: flex; gap: 24px; align-items: center;
+      font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--text-mid); white-space: nowrap;
+      animation: scrollStrip 22s linear infinite; width: max-content;
     }
-    .dot { color:var(--rose); font-size:18px; line-height:1; }
+    .dot { color: var(--rose); font-size: 18px; line-height: 1; }
     @keyframes scrollStrip { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
-    .why-section {
-      position:relative; z-index:1;
-      max-width:1100px; margin:80px auto;
-      padding:0 clamp(20px,5vw,60px); text-align:center;
+    /* ── CTA ────────────────────────────────────────────────── */
+    .cta-section {
+      position: relative; z-index: 1;
+      text-align: center; padding: 60px clamp(20px,5vw,60px) 100px;
     }
-    .why-eyebrow { font-size:11px; letter-spacing:0.25em; text-transform:uppercase; color:var(--text-light); margin-bottom:12px; }
-    .why-title { font-family:var(--font-display); font-size:clamp(32px,5vw,56px); font-weight:300; color:var(--text-dark); margin-bottom:48px; }
-    .why-title em { font-style:italic; color:var(--rose-deep); }
-    .why-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:28px; }
-    @media(max-width:600px){ .why-grid { grid-template-columns:1fr; } }
-    .why-card {
-      background:white; border-radius:var(--radius-lg); padding:36px 28px; text-align:center;
-      box-shadow:var(--shadow-card); border:1px solid rgba(212,184,150,0.15);
-      transition:transform var(--transition), box-shadow var(--transition);
-    }
-    .why-card:hover { transform:translateY(-6px); box-shadow:0 12px 40px rgba(44,31,34,0.1); }
-    .why-icon { font-size:40px; margin-bottom:16px; }
-    .why-card-title { font-family:var(--font-display); font-size:22px; font-weight:400; color:var(--text-dark); margin-bottom:10px; }
-    .why-card-desc { font-size:13px; color:var(--text-light); font-weight:300; line-height:1.7; }
-
-    .cta-section { position:relative; z-index:1; text-align:center; padding:60px clamp(20px,5vw,60px) 100px; }
     .cta-box {
-      max-width:560px; margin:0 auto;
-      background:linear-gradient(135deg,#2c1f22,#c97b8a);
-      border-radius:var(--radius-xl); padding:60px 48px;
-      position:relative; overflow:hidden;
+      max-width: 560px; margin: 0 auto;
+      background: linear-gradient(135deg, #2c1f22, #c97b8a);
+      border-radius: var(--radius-xl); padding: 60px 48px;
+      position: relative; overflow: hidden;
+      box-shadow: 0 24px 80px rgba(201,123,138,0.35);
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
     }
-    .cta-box::before { content:'💅'; position:absolute; right:32px; top:24px; font-size:80px; opacity:0.12; user-select:none; }
-    .cta-box h2 { font-family:var(--font-display); font-size:clamp(28px,4vw,44px); font-weight:300; color:white; margin-bottom:14px; }
-    .cta-box h2 em { font-style:italic; color:var(--rose-soft); }
-    .cta-box p { font-size:14px; color:rgba(255,255,255,0.7); margin-bottom:32px; font-weight:300; line-height:1.7; }
+    .cta-box:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 32px 100px rgba(201,123,138,0.4);
+    }
+    .cta-box::before {
+      content: '💅'; position: absolute; right: 32px; top: 24px;
+      font-size: 80px; opacity: 0.12; user-select: none;
+      animation: float3d 4s ease-in-out infinite;
+    }
+    .cta-box h2 {
+      font-family: var(--font-display); font-size: clamp(28px,4vw,44px);
+      font-weight: 300; color: white; margin-bottom: 14px;
+    }
+    .cta-box h2 em { font-style: italic; color: var(--rose-soft); }
+    .cta-box p {
+      font-size: 14px; color: rgba(255,255,255,0.7);
+      margin-bottom: 32px; font-weight: 300; line-height: 1.7;
+    }
     .btn-white {
-      display:inline-flex; align-items:center; gap:8px;
-      background:white; color:var(--rose-deep);
-      font-family:var(--font-body); font-size:13px; font-weight:500;
-      letter-spacing:0.08em; text-transform:uppercase;
-      padding:14px 32px; border-radius:var(--radius-xl);
-      border:none; cursor:pointer; text-decoration:none;
-      transition:transform var(--transition), box-shadow var(--transition);
+      display: inline-flex; align-items: center; gap: 8px;
+      background: white; color: var(--rose-deep);
+      font-family: var(--font-body); font-size: 13px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 14px 32px; border-radius: var(--radius-xl);
+      border: none; cursor: pointer; text-decoration: none;
+      transition: transform var(--transition), box-shadow var(--transition);
     }
-    .btn-white:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.2); }
+    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+    /* ── Scroll indicator ───────────────────────────────────── */
+    .scroll-hint {
+      position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      opacity: 0; animation: fadeUp 1s 1.2s forwards;
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-light); z-index: 1;
+    }
+    .scroll-mouse {
+      width: 20px; height: 32px;
+      border: 1.5px solid var(--rose-soft); border-radius: 10px;
+      position: relative;
+    }
+    .scroll-mouse::after {
+      content: '';
+      width: 3px; height: 6px;
+      background: var(--rose);
+      border-radius: 2px;
+      position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
+      animation: scrollBounce 1.5s ease-in-out infinite;
+    }
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+      80%       { transform: translateX(-50%) translateY(10px); opacity: 0; }
+    }
   </style>
 </head>
 <body class="home-page">
+
+  <!-- Three.js 3D canvas de fondo -->
+  <canvas id="hero-canvas"></canvas>
 
   <div class="bg-orb bg-orb--1"></div>
   <div class="bg-orb bg-orb--2"></div>
@@ -166,13 +283,19 @@
       <a href="services.html" class="btn-primary">Ver servicios</a>
       <a href="services.html" class="btn-ghost">Agendar cita →</a>
     </div>
+
     <div class="floating-badge floating-badge--left">
       <span class="badge-num">9+</span>
       <span class="badge-label">servicios<br>disponibles</span>
     </div>
     <div class="floating-badge floating-badge--right">
-      <span class="badge-num">💅</span>
+      <span class="badge-num" id="badge-live">💅</span>
       <span class="badge-label">reserva<br>online</span>
+    </div>
+
+    <div class="scroll-hint">
+      <div class="scroll-mouse"></div>
+      <span>scroll</span>
     </div>
   </main>
 
@@ -195,20 +318,26 @@
     <p class="why-eyebrow">¿Por qué elegirnos?</p>
     <h2 class="why-title">Arte, cuidado y <em>estilo</em></h2>
     <div class="why-grid">
-      <div class="why-card">
-        <div class="why-icon">💅</div>
-        <h3 class="why-card-title">Especialistas en uñas</h3>
-        <p class="why-card-desc">Técnicas profesionales con productos de la más alta calidad para resultados que duran.</p>
+      <div class="why-card-wrapper">
+        <div class="why-card" data-tilt>
+          <div class="why-icon">💅</div>
+          <h3 class="why-card-title">Especialistas en uñas</h3>
+          <p class="why-card-desc">Técnicas profesionales con productos de la más alta calidad para resultados que duran.</p>
+        </div>
       </div>
-      <div class="why-card">
-        <div class="why-icon">📅</div>
-        <h3 class="why-card-title">Reserva en segundos</h3>
-        <p class="why-card-desc">Elige tu servicio, horario y método de pago desde tu celular sin llamadas ni esperas.</p>
+      <div class="why-card-wrapper">
+        <div class="why-card" data-tilt>
+          <div class="why-icon">📅</div>
+          <h3 class="why-card-title">Reserva en segundos</h3>
+          <p class="why-card-desc">Elige tu servicio, horario y método de pago desde tu celular sin llamadas ni esperas.</p>
+        </div>
       </div>
-      <div class="why-card">
-        <div class="why-icon">🌸</div>
-        <h3 class="why-card-title">Atención personalizada</h3>
-        <p class="why-card-desc">Cada clienta es especial. Te atendemos con cariño y te cuidamos en cada detalle.</p>
+      <div class="why-card-wrapper">
+        <div class="why-card" data-tilt>
+          <div class="why-icon">🌸</div>
+          <h3 class="why-card-title">Atención personalizada</h3>
+          <p class="why-card-desc">Cada clienta es especial. Te atendemos con cariño y te cuidamos en cada detalle.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -221,11 +350,161 @@
     </div>
   </section>
 
+  <!-- Three.js via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
   <script type="module">
+    /* ═══════════════════════════════════════════════════
+       THREE.JS — Cristales 3D flotantes en el fondo
+    ═══════════════════════════════════════════════════ */
+    (function init3D() {
+      const canvas   = document.getElementById("hero-canvas");
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      const scene  = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.z = 8;
+
+      /* ── Iluminación ──────────────────────────────────── */
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      const dirLight = new THREE.DirectionalLight(0xf5d5dc, 1.2);
+      dirLight.position.set(5, 5, 5);
+      scene.add(dirLight);
+      const pinkLight = new THREE.PointLight(0xe8a4b0, 2, 20);
+      pinkLight.position.set(-4, 2, 3);
+      scene.add(pinkLight);
+      const goldLight = new THREE.PointLight(0xd4b896, 1.5, 20);
+      goldLight.position.set(4, -2, 3);
+      scene.add(goldLight);
+
+      /* ── Geometrías de cristales ─────────────────────── */
+      const PALETTE = [0xe8a4b0, 0xf5d5dc, 0xd4b896, 0xc97b8a, 0xf5ead8, 0xfaf5f0];
+      const geos = [
+        new THREE.OctahedronGeometry(0.35, 0),
+        new THREE.TetrahedronGeometry(0.3,  0),
+        new THREE.IcosahedronGeometry(0.28, 0),
+        new THREE.OctahedronGeometry(0.2,  0),
+        new THREE.TetrahedronGeometry(0.18, 0),
+      ];
+
+      const crystals = [];
+      const COUNT = 28;
+
+      for (let i = 0; i < COUNT; i++) {
+        const geo = geos[Math.floor(Math.random() * geos.length)];
+        const color = PALETTE[Math.floor(Math.random() * PALETTE.length)];
+        const mat = new THREE.MeshPhongMaterial({
+          color,
+          shininess: 120,
+          transparent: true,
+          opacity: 0.25 + Math.random() * 0.35,
+          wireframe: Math.random() > 0.7,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(
+          (Math.random() - 0.5) * 18,
+          (Math.random() - 0.5) * 12,
+          (Math.random() - 0.5) * 6 - 2
+        );
+        mesh.rotation.set(
+          Math.random() * Math.PI * 2,
+          Math.random() * Math.PI * 2,
+          Math.random() * Math.PI * 2
+        );
+        const s = 0.6 + Math.random() * 1.4;
+        mesh.scale.setScalar(s);
+        scene.add(mesh);
+        crystals.push({
+          mesh,
+          rotSpeed: { x: (Math.random() - 0.5) * 0.008, y: (Math.random() - 0.5) * 0.01 },
+          floatSpeed: 0.4 + Math.random() * 0.6,
+          floatAmp:   0.15 + Math.random() * 0.25,
+          initY: mesh.position.y,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
+
+      /* ── Partículas (polvo de brillo) ────────────────── */
+      const PARTS = 200;
+      const pGeom = new THREE.BufferGeometry();
+      const pPos  = new Float32Array(PARTS * 3);
+      for (let i = 0; i < PARTS * 3; i++) pPos[i] = (Math.random() - 0.5) * 24;
+      pGeom.setAttribute("position", new THREE.BufferAttribute(pPos, 3));
+      const pMat = new THREE.PointsMaterial({
+        color: 0xe8a4b0, size: 0.04, transparent: true, opacity: 0.5
+      });
+      scene.add(new THREE.Points(pGeom, pMat));
+
+      /* ── Mouse parallax ─────────────────────────────── */
+      const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+      window.addEventListener("mousemove", e => {
+        mouse.tx = (e.clientX / window.innerWidth  - 0.5) * 1.2;
+        mouse.ty = (e.clientY / window.innerHeight - 0.5) * 0.8;
+      });
+
+      /* ── Resize ──────────────────────────────────────── */
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      /* ── Animación principal ─────────────────────────── */
+      let t = 0;
+      function animate() {
+        requestAnimationFrame(animate);
+        t += 0.01;
+
+        // Suavizar mouse
+        mouse.x += (mouse.tx - mouse.x) * 0.04;
+        mouse.y += (mouse.ty - mouse.y) * 0.04;
+        camera.position.x = mouse.x * 0.8;
+        camera.position.y = -mouse.y * 0.5;
+
+        // Rotar y flotar cristales
+        crystals.forEach(c => {
+          c.mesh.rotation.x += c.rotSpeed.x;
+          c.mesh.rotation.y += c.rotSpeed.y;
+          c.mesh.position.y = c.initY + Math.sin(t * c.floatSpeed + c.phase) * c.floatAmp;
+        });
+
+        // Pulso de luz rosa
+        pinkLight.intensity = 1.8 + Math.sin(t * 0.7) * 0.4;
+        goldLight.intensity = 1.3 + Math.cos(t * 0.5) * 0.3;
+
+        renderer.render(scene, camera);
+      }
+      animate();
+    })();
+
+    /* ═══════════════════════════════════════════════════
+       3D TILT en cards (mouse hover)
+    ═══════════════════════════════════════════════════ */
+    document.querySelectorAll("[data-tilt]").forEach(card => {
+      const wrapper = card.parentElement;
+      wrapper.addEventListener("mousemove", e => {
+        const r = wrapper.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width  - 0.5;
+        const y = (e.clientY - r.top)  / r.height - 0.5;
+        card.style.transform = `perspective(800px) rotateY(${x * 14}deg) rotateX(${-y * 10}deg) translateZ(8px)`;
+      });
+      wrapper.addEventListener("mouseleave", () => {
+        card.style.transform = "perspective(800px) rotateY(0deg) rotateX(0deg) translateZ(0)";
+      });
+    });
+
+    /* ═══════════════════════════════════════════════════
+       FIREBASE AUTH + TIEMPO REAL
+    ═══════════════════════════════════════════════════ */
     import { initializeApp, getApps, getApp }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut }
+    import { getAuth, onAuthStateChanged }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, collection, query, where,
+             onSnapshot, orderBy, limit }
+      from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey:            "AIzaSyDFsFLw518RovvIPGcIzFDrih4oKBKgz-o",
@@ -238,8 +517,10 @@
 
     const app     = getApps().length ? getApp() : initializeApp(firebaseConfig);
     const auth    = getAuth(app);
+    const db      = getFirestore(app);
     const isGuest = sessionStorage.getItem("wsn-guest") === "true";
 
+    /* ── Auth guard ─────────────────────────────────────── */
     onAuthStateChanged(auth, user => {
       if (!user && !isGuest) {
         window.location.replace("login.html"); return;
@@ -262,6 +543,25 @@
                 : name.charAt(0).toUpperCase()}
             </div>
           </a>`;
+
+        /* ── Citas próximas en TIEMPO REAL para el badge ── */
+        const today = new Date().toISOString().split("T")[0];
+        const q = query(
+          collection(db, "reservations"),
+          where("userId",  "==", user.uid),
+          where("date",    ">=", today),
+          where("status",  "in", ["pendiente", "confirmada"]),
+          orderBy("date"),
+          limit(5)
+        );
+        onSnapshot(q, snap => {
+          const badge = document.getElementById("badge-live");
+          if (badge) {
+            badge.textContent = snap.size > 0 ? snap.size : "💅";
+            badge.style.color = snap.size > 0 ? "var(--rose-deep)" : "";
+          }
+        });
+
       } else {
         greeting.textContent = "Bienvenida 💅";
         slot.innerHTML = `<a href="login.html" class="nav-cta">Iniciar sesión</a>`;
