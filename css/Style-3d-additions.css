@@ -1,0 +1,248 @@
+/* ============================================
+   WOMEN SECRET NAILS — style-3d-additions.css
+   Pega este bloque AL FINAL de style.css
+   ============================================ */
+
+/* ── Cards de servicio con 3D nativo ────────── */
+.card {
+  transform-style: preserve-3d;
+  will-change: transform;
+  /* Transición más suave para el tilt por JS */
+  transition: box-shadow 0.35s ease;
+}
+
+/* Efecto brillo en hover sobre imagen */
+.card-image-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.15) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.card:hover .card-image-wrap::after { opacity: 1; }
+
+/* ── Botón de reserva con shimmer 3D ─────────── */
+.card-btn {
+  position: relative;
+  overflow: hidden;
+}
+.card-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -60%;
+  width: 30%; height: 200%;
+  background: rgba(255,255,255,0.3);
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+}
+.card-btn:hover::after { left: 130%; }
+
+/* ── Indicador en tiempo real ────────────────── */
+.realtime-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  background: #4caf50;
+  border-radius: 50%;
+  margin-right: 6px;
+  animation: pulse-green 1.8s ease-in-out infinite;
+  vertical-align: middle;
+}
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.5); }
+  50%       { box-shadow: 0 0 0 6px rgba(76,175,80,0); }
+}
+
+/* ── Modal con profundidad 3D ────────────────── */
+.modal-content {
+  transform-style: preserve-3d;
+}
+
+/* Steps con animación más premium */
+.modal-step {
+  animation: slideIn3D 0.3s cubic-bezier(0.34,1.2,0.64,1) forwards;
+}
+@keyframes slideIn3D {
+  from { opacity:0; transform: perspective(600px) translateZ(-30px) translateY(12px); }
+  to   { opacity:1; transform: perspective(600px) translateZ(0) translateY(0); }
+}
+
+/* ── Time slot con efecto de profundidad ─────── */
+.time-slot {
+  transform-style: preserve-3d;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition),
+    transform 0.2s cubic-bezier(0.34,1.4,0.64,1),
+    box-shadow 0.2s ease;
+}
+.time-slot:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(201,123,138,0.2);
+}
+.time-slot.selected {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 4px 14px rgba(201,123,138,0.35);
+}
+
+/* ── Payment cards con 3D hover ──────────────── */
+.payment-card {
+  transform-style: preserve-3d;
+  transition:
+    border-color var(--transition),
+    background var(--transition),
+    transform 0.3s cubic-bezier(0.34,1.2,0.64,1),
+    box-shadow 0.3s ease;
+}
+.payment-option:hover .payment-card {
+  transform: translateY(-4px) rotateX(3deg);
+  box-shadow: 0 10px 30px rgba(201,123,138,0.2);
+}
+.payment-option input:checked ~ .payment-card {
+  transform: translateY(-2px) rotateX(2deg);
+}
+
+/* ── Staff card con 3D ───────────────────────── */
+.staff-card {
+  transition:
+    border-color var(--transition),
+    background var(--transition),
+    transform 0.3s cubic-bezier(0.34,1.2,0.64,1),
+    box-shadow 0.3s ease !important;
+}
+.staff-card:hover {
+  transform: translateY(-3px) perspective(400px) rotateX(2deg) !important;
+  box-shadow: 0 8px 24px rgba(201,123,138,0.18) !important;
+}
+.staff-card.selected {
+  transform: translateY(-2px) !important;
+}
+
+/* ── Success icon con animación 3D ───────────── */
+.success-icon {
+  animation: pop3D 0.6s cubic-bezier(0.34,1.6,0.64,1) forwards;
+}
+@keyframes pop3D {
+  0%   { transform: scale(0.4) rotateY(90deg); opacity:0; }
+  60%  { transform: scale(1.15) rotateY(-8deg); opacity:1; }
+  100% { transform: scale(1) rotateY(0deg); opacity:1; }
+}
+
+/* ── Floating badges con glassmorphism ────────── */
+.floating-badge {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.82);
+  animation-fill-mode: both;
+}
+
+/* ── Navegación del header con transición suave── */
+.header-nav a,
+.nav-cta {
+  transition: color var(--transition), background var(--transition),
+              transform var(--transition) !important;
+}
+
+/* ── Logo con efecto 3D sutil ────────────────── */
+.logo-mark {
+  transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1),
+              color var(--transition);
+}
+.logo-mark:hover {
+  transform: scale(1.08) rotateZ(-2deg);
+}
+
+/* ── Orbs con movimiento ─────────────────────── */
+.bg-orb--1 { animation: driftOrb1 12s ease-in-out infinite; }
+.bg-orb--2 { animation: driftOrb2 15s ease-in-out infinite; }
+.bg-orb--3 { animation: driftOrb3 10s ease-in-out infinite; }
+
+@keyframes driftOrb1 {
+  0%, 100% { transform: translate(0,0); }
+  33%       { transform: translate(-30px, 20px); }
+  66%       { transform: translate(20px, -15px); }
+}
+@keyframes driftOrb2 {
+  0%, 100% { transform: translate(0,0); }
+  33%       { transform: translate(25px, -20px); }
+  66%       { transform: translate(-20px, 15px); }
+}
+@keyframes driftOrb3 {
+  0%, 100% { transform: translate(-50%,-50%); }
+  50%       { transform: translate(-50%,-50%) scale(1.2); }
+}
+
+/* ── Scroll suave y mejorado ─────────────────── */
+html { scroll-behavior: smooth; }
+
+/* ── Selección de texto con rosa ─────────────── */
+::selection {
+  background: var(--rose-soft);
+  color: var(--rose-deep);
+}
+
+/* ── Input con glow rosa ─────────────────────── */
+.form-input:focus {
+  box-shadow: 0 0 0 3px rgba(232,164,176,0.25),
+              0 4px 12px rgba(201,123,138,0.1);
+  border-color: var(--rose);
+}
+
+/* ── Btn primary con sombra animada ──────────── */
+.btn-primary {
+  box-shadow: 0 4px 0 rgba(160,80,95,0.4);
+  transition:
+    background var(--transition),
+    transform var(--transition),
+    box-shadow var(--transition);
+}
+.btn-primary:hover {
+  box-shadow: 0 8px 24px rgba(201,123,138,0.35),
+              0 2px 0 rgba(160,80,95,0.3);
+}
+.btn-primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(160,80,95,0.4);
+}
+
+/* ── Admin panel — reservas en tiempo real ───── */
+.reservation-card {
+  transition: transform 0.3s cubic-bezier(0.34,1.2,0.64,1),
+              box-shadow 0.3s ease;
+}
+.reservation-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 36px rgba(44,31,34,0.1);
+}
+
+/* Nueva reserva recién llegada */
+@keyframes newCard {
+  0%   { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(232,164,176,0.4); }
+  100% { border-color: rgba(212,184,150,0.15); box-shadow: var(--shadow-card); }
+}
+.reservation-card--new {
+  animation: fadeUp 0.4s forwards, newCard 2s 0.4s forwards;
+}
+
+/* ── Mobile — ajustes 3D deshabilitados en táctil */
+@media (hover: none) {
+  .card:hover,
+  .why-card:hover,
+  .payment-card:hover,
+  .staff-card:hover {
+    transform: none !important;
+  }
+  /* En móvil el 3D del canvas se reduce para performance */
+}
+
+/* ── Animación fadeUp mejorada ───────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
