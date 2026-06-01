@@ -9,42 +9,82 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    /* Avatar del cliente en el header */
-    .client-nav {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    /* ── Avatar del cliente en el header ── */
+    .client-nav { display:flex; align-items:center; gap:12px; }
     .client-avatar {
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      background: var(--rose-pale);
-      border: 2px solid var(--rose-soft);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; overflow: hidden;
-      cursor: pointer;
-      transition: border-color var(--transition);
+      width:34px; height:34px; border-radius:50%;
+      background:var(--rose-pale); border:2px solid var(--rose-soft);
+      display:flex; align-items:center; justify-content:center;
+      font-size:14px; overflow:hidden; cursor:pointer;
+      transition:border-color var(--transition);
     }
-    .client-avatar:hover { border-color: var(--rose-deep); }
+    .client-avatar:hover { border-color:var(--rose-deep); }
     .client-avatar img { width:100%; height:100%; object-fit:cover; }
-    .client-name-nav {
-      font-size: 13px; color: var(--text-mid);
-      font-weight: 400;
-    }
+    .client-name-nav { font-size:13px; color:var(--text-mid); font-weight:400; }
     @media(max-width:480px){ .client-name-nav { display:none; } }
+    .guest-nav-badge { font-size:11px; color:var(--text-light); letter-spacing:0.04em; }
+    .guest-nav-badge a { color:var(--rose-deep); font-weight:500; text-decoration:none; }
+    .guest-nav-badge a:hover { text-decoration:underline; }
 
-    /* Guest badge */
-    .guest-nav-badge {
-      font-size: 11px;
-      color: var(--text-light);
-      letter-spacing: 0.04em;
+    /* ── Panel Nequi/Daviplata ── */
+    .nequi-panel {
+      display: none;
+      background: linear-gradient(135deg, #f0fff4, #e8f5e9);
+      border: 1.5px solid #a5d6a7;
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      margin-top: 14px;
+      animation: fadeUp 0.3s forwards;
     }
-    .guest-nav-badge a {
-      color: var(--rose-deep);
-      font-weight: 500;
-      text-decoration: none;
+    .nequi-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
     }
-    .guest-nav-badge a:hover { text-decoration: underline; }
+    .nequi-icon { font-size: 28px; flex-shrink: 0; }
+    .nequi-info { flex: 1; }
+    .nequi-label {
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: #388e3c; font-weight: 500; margin-bottom: 2px;
+    }
+    .nequi-number {
+      font-family: var(--font-display); font-size: 24px;
+      font-weight: 600; color: #2e7d32; letter-spacing: 0.04em;
+    }
+    .nequi-copy {
+      padding: 8px 16px; background: #388e3c; color: white;
+      border: none; border-radius: var(--radius-xl);
+      font-family: var(--font-body); font-size: 12px; font-weight: 500;
+      cursor: pointer; transition: background 0.2s, transform 0.15s;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .nequi-copy:hover { background: #2e7d32; transform: translateY(-1px); }
+    .nequi-hint {
+      font-size: 12px; color: #388e3c; line-height: 1.6;
+      font-weight: 300; margin-top: 4px;
+    }
+    .nequi-name {
+      font-size: 12px; color: #388e3c; font-weight: 500;
+      margin-top: 6px;
+    }
+
+    /* ── Botón WhatsApp ── */
+    .btn-whatsapp {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 13px; background: #25D366; color: white;
+      border: none; border-radius: var(--radius-xl);
+      font-family: var(--font-body); font-size: 13px; font-weight: 500;
+      letter-spacing: 0.06em; cursor: pointer; text-decoration: none;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-whatsapp:hover {
+      background: #1ebe5d; transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37,211,102,0.35);
+    }
+
+    /* Mobile ajustes pago */
+    @media(max-width:480px) {
+      .nequi-header { flex-wrap: wrap; }
+      .nequi-copy { width: 100%; text-align: center; margin-top: 8px; }
+    }
   </style>
 </head>
 <body class="services-page">
@@ -58,7 +98,6 @@
       <nav class="header-nav">
         <a href="index.html">Inicio</a>
         <span class="nav-current">Servicios</span>
-        <!-- Se llena dinámicamente por JS -->
         <div id="client-nav-slot"></div>
       </nav>
     </div>
@@ -91,7 +130,7 @@
         <button id="close-modal" class="modal-close" aria-label="Cerrar">&times;</button>
       </div>
 
-      <!-- 5 pasos -->
+      <!-- Indicador de 5 pasos -->
       <div class="modal-steps">
         <div class="step active" id="step-dot-1"></div>
         <div class="step-line"></div>
@@ -104,7 +143,7 @@
         <div class="step" id="step-dot-5"></div>
       </div>
 
-      <!-- Paso 1: Fecha y hora -->
+      <!-- ── Paso 1: Fecha y hora ── -->
       <div class="modal-step" id="step-1">
         <h3 class="step-title">¿Cuándo quieres venir?</h3>
         <div class="form-group">
@@ -120,7 +159,7 @@
         <button class="btn-primary btn-full" id="next-step-2">Continuar →</button>
       </div>
 
-      <!-- Paso 2: Especialista -->
+      <!-- ── Paso 2: Especialista ── -->
       <div class="modal-step hidden" id="step-2">
         <h3 class="step-title">¿Con quién quieres tu cita?</h3>
         <div class="staff-list" id="staff-list"></div>
@@ -130,7 +169,7 @@
         </div>
       </div>
 
-      <!-- Paso 3: Datos del cliente -->
+      <!-- ── Paso 3: Datos del cliente ── -->
       <div class="modal-step hidden" id="step-3">
         <h3 class="step-title">¿Cómo te llamamos?</h3>
         <div class="form-group">
@@ -147,10 +186,11 @@
         </div>
       </div>
 
-      <!-- Paso 4: Método de pago -->
+      <!-- ── Paso 4: Método de pago ── -->
       <div class="modal-step hidden" id="step-4">
         <h3 class="step-title">¿Cómo prefieres pagar?</h3>
         <div class="payment-options">
+
           <label class="payment-option">
             <input type="radio" name="payment" value="efectivo">
             <div class="payment-card">
@@ -159,22 +199,41 @@
               <span class="payment-desc">Pagas el día de tu cita</span>
             </div>
           </label>
+
           <label class="payment-option">
-            <input type="radio" name="payment" value="virtual">
+            <input type="radio" name="payment" value="nequi">
             <div class="payment-card">
-              <span class="payment-icon">💳</span>
-              <span class="payment-name">Virtual</span>
-              <span class="payment-desc">Nequi o Transferencia</span>
+              <span class="payment-icon">📱</span>
+              <span class="payment-name">Nequi / Daviplata</span>
+              <span class="payment-desc">Transfiere antes de tu cita</span>
             </div>
           </label>
+
         </div>
-        <div class="step-nav">
+
+        <!-- Panel de datos Nequi — aparece al seleccionar pago virtual -->
+        <div id="nequi-panel" class="nequi-panel">
+          <div class="nequi-header">
+            <span class="nequi-icon">📱</span>
+            <div class="nequi-info">
+              <p class="nequi-label">Nequi · Daviplata</p>
+              <p class="nequi-number">301 788 6217</p>
+            </div>
+            <button class="nequi-copy" id="nequi-copy-btn" type="button">Copiar número</button>
+          </div>
+          <p class="nequi-name">A nombre de: <strong>Women Secret Nails</strong></p>
+          <p class="nequi-hint" style="margin-top:8px;">
+            💬 Después de reservar te llegará un botón para enviar el comprobante por WhatsApp.
+          </p>
+        </div>
+
+        <div class="step-nav" style="margin-top:20px;">
           <button class="btn-ghost" id="back-step-3">← Volver</button>
           <button class="btn-primary" id="next-step-5">Continuar →</button>
         </div>
       </div>
 
-      <!-- Paso 5: Confirmar -->
+      <!-- ── Paso 5: Confirmar ── -->
       <div class="modal-step hidden" id="step-5">
         <h3 class="step-title">Confirma tu cita</h3>
         <div class="summary-card">
@@ -217,16 +276,27 @@
         </div>
       </div>
 
-      <!-- Éxito -->
+      <!-- ── Éxito ── -->
       <div class="modal-step hidden" id="step-success">
         <div class="success-state">
           <div class="success-icon">✓</div>
           <h3 class="success-title">¡Cita agendada!</h3>
           <p class="success-desc">
-            Tu solicitud fue enviada.<br>
-            Te contactaremos para confirmar 💅
+            Tu solicitud fue enviada con éxito.<br>
+            Te avisaremos cuando esté confirmada 💅
           </p>
           <div style="display:flex;flex-direction:column;gap:10px;width:100%;">
+
+            <!-- Botón enviar comprobante Nequi (solo aparece si pagó virtual) -->
+            <div id="comprobante-btn-wrap" style="display:none;">
+              <a id="comprobante-wa-btn" href="#" target="_blank" class="btn-whatsapp">
+                📲 Enviar comprobante por WhatsApp
+              </a>
+              <p style="font-size:11px;color:var(--text-light);text-align:center;margin-top:6px;line-height:1.5;">
+                Envía la captura de tu transferencia para confirmar el pago
+              </p>
+            </div>
+
             <a href="profile.html" class="btn-primary" style="text-align:center;">Ver mis citas →</a>
             <button class="btn-ghost btn-full" id="close-success">Seguir viendo servicios</button>
           </div>
