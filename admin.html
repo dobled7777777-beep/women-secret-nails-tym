@@ -10,81 +10,54 @@
   <link rel="stylesheet" href="css/style.css">
   <style>
     .admin-wrap {
-      max-width: 720px;
-      margin: 0 auto;
+      max-width: 720px; margin: 0 auto;
       padding: 0 clamp(16px,4vw,40px) 80px;
-      position: relative;
-      z-index: 1;
+      position: relative; z-index: 1;
     }
+
     /* ── Login ── */
     .login-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: calc(100vh - 68px);
-      padding: 40px 20px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: calc(100vh - 68px); padding: 40px 20px;
     }
     .login-card {
-      background: white;
-      border-radius: var(--radius-lg);
-      padding: 44px 40px;
-      max-width: 420px;
-      width: 100%;
+      background: white; border-radius: var(--radius-lg);
+      padding: 44px 40px; max-width: 420px; width: 100%;
       box-shadow: var(--shadow-modal);
-      border: 1px solid rgba(212,184,150,0.2);
-      text-align: center;
+      border: 1px solid rgba(212,184,150,0.2); text-align: center;
     }
     .login-icon { font-size: 42px; margin-bottom: 16px; }
     .login-card h2 {
-      font-family: var(--font-display);
-      font-size: 30px; font-weight: 400;
-      color: var(--text-dark); margin-bottom: 6px;
+      font-family: var(--font-display); font-size: 30px;
+      font-weight: 400; color: var(--text-dark); margin-bottom: 6px;
     }
-    .login-sub {
-      font-size: 14px; color: var(--text-light);
-      margin-bottom: 32px; font-weight: 300; line-height: 1.6;
-    }
+    .login-sub { font-size: 14px; color: var(--text-light); margin-bottom: 32px; font-weight: 300; line-height: 1.6; }
     .btn-google {
-      width: 100%; padding: 13px;
-      background: white; color: #3c4043;
-      border: 1px solid #dadce0;
-      border-radius: var(--radius-sm);
+      width: 100%; padding: 13px; background: white; color: #3c4043;
+      border: 1px solid #dadce0; border-radius: var(--radius-sm);
       font-family: var(--font-body); font-size: 14px; font-weight: 500;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      transition: background var(--transition), box-shadow var(--transition);
-      margin-bottom: 12px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: background var(--transition), box-shadow var(--transition); margin-bottom: 12px;
     }
     .btn-google:hover { background: #f8f9fa; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .auth-divider {
-      display: flex; align-items: center; gap: 12px; margin: 16px 0;
-    }
-    .auth-divider::before, .auth-divider::after {
-      content: ''; flex: 1; height: 1px; background: rgba(212,184,150,0.3);
-    }
-    .auth-divider span {
-      font-size: 11px; color: var(--text-light);
-      letter-spacing: 0.1em; text-transform: uppercase;
-    }
+    .auth-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
+    .auth-divider::before,.auth-divider::after { content:''; flex:1; height:1px; background:rgba(212,184,150,0.3); }
+    .auth-divider span { font-size: 11px; color: var(--text-light); letter-spacing: 0.1em; text-transform: uppercase; }
     .login-field {
       width: 100%; padding: 13px 16px;
-      border: 1px solid rgba(212,184,150,0.4);
-      border-radius: var(--radius-sm);
+      border: 1px solid rgba(212,184,150,0.4); border-radius: var(--radius-sm);
       font-family: var(--font-body); font-size: 14px;
       background: var(--nude-pale); color: var(--text-dark);
-      outline: none; margin-bottom: 12px;
-      transition: border-color var(--transition);
+      outline: none; margin-bottom: 12px; transition: border-color var(--transition);
     }
     .login-field:focus { border-color: var(--rose); }
     .login-error {
-      background: var(--rose-pale);
-      border: 1px solid rgba(201,123,138,0.3);
-      border-radius: var(--radius-sm);
-      padding: 10px 14px; font-size: 13px;
-      color: var(--rose-deep); margin-bottom: 14px;
-      display: none; text-align: left;
+      background: var(--rose-pale); border: 1px solid rgba(201,123,138,0.3);
+      border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px;
+      color: var(--rose-deep); margin-bottom: 14px; display: none; text-align: left;
     }
+
     /* ── Panel ── */
     .admin-topbar {
       display: flex; justify-content: space-between;
@@ -93,37 +66,28 @@
     .admin-user { display: flex; align-items: center; gap: 10px; }
     .admin-avatar {
       width: 38px; height: 38px; border-radius: 50%;
-      background: var(--rose-pale);
-      border: 2px solid var(--rose-soft);
+      background: var(--rose-pale); border: 2px solid var(--rose-soft);
       display: flex; align-items: center; justify-content: center;
       font-size: 16px; overflow: hidden;
     }
     .admin-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .admin-user-name { font-size: 13px; color: var(--text-mid); }
     .btn-signout {
-      padding: 8px 18px; background: transparent;
-      color: var(--text-light);
-      border: 1px solid rgba(107,77,85,0.2);
-      border-radius: var(--radius-xl);
-      font-family: var(--font-body); font-size: 12px;
-      cursor: pointer;
+      padding: 8px 18px; background: transparent; color: var(--text-light);
+      border: 1px solid rgba(107,77,85,0.2); border-radius: var(--radius-xl);
+      font-family: var(--font-body); font-size: 12px; cursor: pointer;
       transition: color var(--transition), border-color var(--transition);
     }
     .btn-signout:hover { color: var(--rose-deep); border-color: var(--rose); }
 
     /* Tabs */
-    .admin-tabs {
-      display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
-    }
+    .admin-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
     .tab-btn {
       padding: 8px 18px; border-radius: var(--radius-xl);
-      border: 1px solid rgba(212,184,150,0.3);
-      background: white;
+      border: 1px solid rgba(212,184,150,0.3); background: white;
       font-family: var(--font-body); font-size: 12px; font-weight: 500;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      color: var(--text-mid); cursor: pointer;
-      display: flex; align-items: center; gap: 6px;
-      transition: all 0.2s;
+      letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-mid);
+      cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;
     }
     .tab-btn.active { background: var(--rose-deep); border-color: var(--rose-deep); color: white; }
     .tab-count {
@@ -134,17 +98,11 @@
     .tab-btn:not(.active) .tab-count { background: var(--rose-pale); color: var(--rose-deep); }
 
     /* Filtro */
-    .filter-row {
-      display: flex; align-items: center; gap: 12px;
-      margin-bottom: 20px; flex-wrap: wrap;
-    }
-    .filter-label {
-      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light);
-    }
+    .filter-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-light); }
     .filter-date {
-      padding: 8px 14px;
-      border: 1px solid rgba(212,184,150,0.35); border-radius: var(--radius-sm);
-      font-family: var(--font-body); font-size: 13px;
+      padding: 8px 14px; border: 1px solid rgba(212,184,150,0.35);
+      border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 13px;
       background: var(--nude-pale); color: var(--text-dark); outline: none;
     }
 
@@ -152,56 +110,38 @@
     .reservation-card {
       background: white; border-radius: var(--radius-md);
       padding: 22px 24px; margin-bottom: 14px;
-      box-shadow: var(--shadow-card);
-      border: 1px solid rgba(212,184,150,0.15);
+      box-shadow: var(--shadow-card); border: 1px solid rgba(212,184,150,0.15);
       opacity: 0; animation: fadeUp 0.3s forwards;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .res-top {
-      display: flex; justify-content: space-between;
-      align-items: flex-start; margin-bottom: 16px;
-    }
-    .res-service {
-      font-family: var(--font-display); font-size: 22px;
-      font-weight: 400; color: var(--text-dark); line-height: 1.1;
-    }
-    .res-client {
-      font-size: 13px; color: var(--text-mid);
-      margin-top: 3px; font-weight: 400;
-    }
+    .reservation-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(44,31,34,0.1); }
+    .res-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .res-service { font-family: var(--font-display); font-size: 22px; font-weight: 400; color: var(--text-dark); line-height: 1.1; }
+    .res-client { font-size: 13px; color: var(--text-mid); margin-top: 3px; }
     .res-specialist { font-size: 12px; color: var(--text-light); margin-top: 2px; }
-
     .status-badge {
       font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
-      text-transform: uppercase; padding: 5px 12px;
-      border-radius: var(--radius-xl); white-space: nowrap; cursor: default;
+      text-transform: uppercase; padding: 5px 12px; border-radius: var(--radius-xl); white-space: nowrap;
     }
     .badge-pendiente  { background: var(--gold-pale);  color: var(--nude-deep); }
     .badge-confirmada { background: #e8f5e9;            color: #388e3c; }
     .badge-cancelada  { background: var(--rose-pale);   color: var(--rose-deep); }
-
     .res-grid {
-      display: grid; grid-template-columns: repeat(2,1fr);
-      gap: 10px 20px; margin-bottom: 18px;
+      display: grid; grid-template-columns: repeat(2,1fr); gap: 10px 20px; margin-bottom: 18px;
     }
     .res-item { display: flex; flex-direction: column; gap: 2px; }
-    .res-item-label {
-      font-size: 10px; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--text-light);
-    }
+    .res-item-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-light); }
     .res-item-value { font-size: 14px; color: var(--text-dark); }
+    .phone-link { color: var(--rose-deep); text-decoration: none; font-size: 14px; }
+    .phone-link:hover { text-decoration: underline; }
 
-    /* ── Acciones flexibles ── */
-    .res-actions {
-      display: flex; gap: 8px; flex-wrap: wrap;
-    }
+    /* Acciones */
+    .res-actions { display: flex; gap: 8px; flex-wrap: wrap; }
     .action-btn {
-      flex: 1; min-width: 100px;
-      padding: 9px 8px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-body); font-size: 11px; font-weight: 500;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      cursor: pointer; border: 1px solid transparent;
-      transition: all 0.2s;
+      flex: 1; min-width: 90px; padding: 9px 8px;
+      border-radius: var(--radius-sm); font-family: var(--font-body);
+      font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+      cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
     }
     .action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
     .btn-confirmar  { background: #e8f5e9; color: #388e3c; border-color: #a5d6a7; }
@@ -211,22 +151,54 @@
     .btn-pendiente  { background: var(--gold-pale); color: var(--nude-deep); border-color: rgba(212,184,150,0.4); }
     .btn-pendiente:hover:not(:disabled)  { background: #ede0c4; }
 
-    .admin-empty {
-      text-align: center; padding: 60px 20px; color: var(--text-light);
+    /* Botón WhatsApp en card */
+    .btn-wa-confirm {
+      flex: 1; min-width: 120px; padding: 9px 8px;
+      border-radius: var(--radius-sm); font-family: var(--font-body);
+      font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+      cursor: pointer; border: none; transition: all 0.2s;
+      background: #e8f9ee; color: #1a7a3c;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      text-decoration: none;
     }
-    .admin-empty-icon { font-size: 40px; margin-bottom: 12px; }
-    .admin-empty p { font-size: 14px; font-weight: 300; }
-    .admin-loading {
-      text-align: center; padding: 50px; color: var(--text-light); font-size: 14px;
+    .btn-wa-confirm:hover { background: #25D366; color: white; }
+
+    /* Toast */
+    .admin-toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--text-dark); color: white;
+      padding: 14px 22px; border-radius: var(--radius-xl); font-size: 13px;
+      z-index: 9999; transition: transform 0.35s cubic-bezier(0.34,1.2,0.64,1), opacity 0.35s;
+      opacity: 0; max-width: 92vw; text-align: center;
+      box-shadow: 0 8px 32px rgba(44,31,34,0.25);
+    }
+    .admin-toast--show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* Badge nueva reserva */
+    .new-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--rose-deep); color: white;
+      font-size: 11px; font-weight: 500; padding: 4px 12px;
+      border-radius: var(--radius-xl); animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(201,123,138,0.5); }
+      50%      { box-shadow: 0 0 0 8px rgba(201,123,138,0); }
     }
 
-    /* Teléfono clickeable */
-    .phone-link {
-      color: var(--rose-deep);
-      text-decoration: none;
-      font-size: 14px;
+    /* Empty / loading */
+    .admin-empty { text-align: center; padding: 60px 20px; color: var(--text-light); }
+    .admin-empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .admin-empty p { font-size: 14px; font-weight: 300; }
+    .admin-loading { text-align: center; padding: 50px; color: var(--text-light); font-size: 14px; }
+
+    /* Mobile */
+    @media(max-width:480px) {
+      .res-grid { grid-template-columns: 1fr; }
+      .res-actions { flex-direction: column; }
+      .action-btn, .btn-wa-confirm { min-width: unset; width: 100%; }
     }
-    .phone-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body class="services-page">
@@ -244,7 +216,7 @@
     </div>
   </header>
 
-  <!-- LOGIN -->
+  <!-- ── LOGIN ── -->
   <div id="login-screen" class="login-screen">
     <div class="login-card">
       <div class="login-icon">🔐</div>
@@ -267,11 +239,16 @@
     </div>
   </div>
 
-  <!-- PANEL -->
+  <!-- ── PANEL ADMIN ── -->
   <div id="admin-panel" class="admin-wrap" style="display:none;">
     <div class="page-title" style="padding-left:0;padding-right:0;text-align:left;padding-bottom:20px;">
       <p class="page-eyebrow">Panel de administración</p>
-      <h1 class="page-heading" style="font-size:clamp(32px,5vw,52px);">Mis <em>reservas</em></h1>
+      <h1 class="page-heading" style="font-size:clamp(32px,5vw,52px);">
+        Mis <em>reservas</em>
+        <span id="new-reservations-badge" style="display:none;" class="new-badge">
+          🔔 <span id="new-count">0</span> nuevas
+        </span>
+      </h1>
     </div>
 
     <div class="admin-topbar">
@@ -289,9 +266,15 @@
     </div>
 
     <div class="admin-tabs">
-      <button class="tab-btn active" data-status="pendiente">Pendientes <span class="tab-count" id="cnt-pendiente">0</span></button>
-      <button class="tab-btn" data-status="confirmada">Confirmadas <span class="tab-count" id="cnt-confirmada">0</span></button>
-      <button class="tab-btn" data-status="cancelada">Canceladas <span class="tab-count" id="cnt-cancelada">0</span></button>
+      <button class="tab-btn active" data-status="pendiente">
+        Pendientes <span class="tab-count" id="cnt-pendiente">0</span>
+      </button>
+      <button class="tab-btn" data-status="confirmada">
+        Confirmadas <span class="tab-count" id="cnt-confirmada">0</span>
+      </button>
+      <button class="tab-btn" data-status="cancelada">
+        Canceladas <span class="tab-count" id="cnt-cancelada">0</span>
+      </button>
     </div>
 
     <div id="reservations-list">
@@ -302,14 +285,19 @@
     </div>
   </div>
 
+  <!-- Toast -->
+  <div id="admin-toast" class="admin-toast"></div>
+
   <script type="module">
     import { initializeApp, getApps, getApp }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, updateDoc, query, orderBy }
+    import { getFirestore, collection, doc, updateDoc, query, orderBy, onSnapshot }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signInWithPopup,
              GoogleAuthProvider, signOut, onAuthStateChanged }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { notifyClientEmail, buildClientWhatsAppUrl }
+      from "./js/notifications.js";
 
     const firebaseConfig = {
       apiKey:            "AIzaSyDFsFLw518RovvIPGcIzFDrih4oKBKgz-o",
@@ -331,17 +319,42 @@
     const loginError  = document.getElementById("login-error");
     const listEl      = document.getElementById("reservations-list");
     const filterDate  = document.getElementById("filter-date");
+    const toastEl     = document.getElementById("admin-toast");
 
     let allRes     = [];
     let curStatus  = "pendiente";
     let dateFilter = null;
+    let unsubRes   = null;
+    let prevPendienteCount = -1; // para detectar reservas nuevas
 
     // Hoy por defecto
     const now = new Date();
     filterDate.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
     dateFilter = filterDate.value;
 
-    // ── Auth ──────────────────────────────────────────────────────
+    // ── Toast helper ──────────────────────────────────────────────────────────
+    function showToast(msg, duration = 4000) {
+      toastEl.textContent = msg;
+      toastEl.classList.add("admin-toast--show");
+      setTimeout(() => toastEl.classList.remove("admin-toast--show"), duration);
+    }
+
+    // ── Sonido de notificación ────────────────────────────────────────────────
+    function playNotifSound() {
+      try {
+        const ctx  = new (window.AudioContext || window.webkitAudioContext)();
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.start(); osc.stop(ctx.currentTime + 0.4);
+      } catch(e) { /* silencioso si no hay contexto de audio */ }
+    }
+
+    // ── Auth ──────────────────────────────────────────────────────────────────
     onAuthStateChanged(auth, user => {
       if (user && user.email === AUTHORIZED_EMAIL) {
         loginScreen.style.display = "none";
@@ -349,13 +362,14 @@
         document.getElementById("admin-user-name").textContent = user.displayName || user.email;
         const av = document.getElementById("admin-avatar");
         av.innerHTML = user.photoURL ? `<img src="${user.photoURL}" alt="">` : "💅";
-        loadReservations();
+        subscribeReservations(); // ✅ Tiempo real
       } else if (user) {
-        showErr("Este correo no tiene acceso. Usa tatismahecha01@gmail.com");
+        showErr("Este correo no tiene acceso.");
         signOut(auth);
       } else {
         loginScreen.style.display = "flex";
         adminPanel.style.display  = "none";
+        if (unsubRes) { unsubRes(); unsubRes = null; }
       }
     });
 
@@ -363,12 +377,10 @@
       try { await signInWithPopup(auth, gProvider); }
       catch { showErr("Error con Google. Intenta de nuevo."); }
     };
-
     document.getElementById("btn-email-login").onclick = loginEmail;
     document.getElementById("login-password").addEventListener("keydown", e => {
       if (e.key === "Enter") loginEmail();
     });
-
     async function loginEmail() {
       const email = document.getElementById("login-email").value.trim();
       const pass  = document.getElementById("login-password").value;
@@ -376,26 +388,47 @@
       try { await signInWithEmailAndPassword(auth, email, pass); }
       catch { showErr("Correo o contraseña incorrectos."); }
     }
-
     document.getElementById("btn-signout").onclick = () => signOut(auth);
     function showErr(msg) { loginError.textContent = msg; loginError.style.display = "block"; }
 
-    // ── Cargar reservas ───────────────────────────────────────────
-    async function loadReservations() {
+    // ══════════════════════════════════════════════════════════════════════════
+    // ✅ TIEMPO REAL — onSnapshot para reservas
+    // La admin ve las nuevas citas al instante sin recargar
+    // ══════════════════════════════════════════════════════════════════════════
+    function subscribeReservations() {
+      if (unsubRes) unsubRes();
       listEl.innerHTML = `<div class="admin-loading"><div class="loading-spinner" style="margin:0 auto 12px;"></div>Cargando...</div>`;
-      try {
-        const snap = await getDocs(query(
-          collection(db,"reservations"),
-          orderBy("date","asc"),
-          orderBy("time","asc")
-        ));
+
+      const q = query(collection(db, "reservations"), orderBy("date","asc"), orderBy("time","asc"));
+      unsubRes = onSnapshot(q, snap => {
         allRes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        // Detectar reservas nuevas pendientes → sonido + badge
+        const pendienteCount = allRes.filter(r =>
+          r.status === "pendiente" && (!dateFilter || r.date === dateFilter)
+        ).length;
+
+        if (prevPendienteCount !== -1 && pendienteCount > prevPendienteCount) {
+          const diff = pendienteCount - prevPendienteCount;
+          playNotifSound();
+          showToast(`🔔 ${diff} nueva${diff > 1 ? "s" : ""} cita${diff > 1 ? "s" : ""} pendiente${diff > 1 ? "s" : ""}!`);
+          document.title = `(${pendienteCount}) Admin · WSN`;
+          const badge = document.getElementById("new-reservations-badge");
+          const countEl = document.getElementById("new-count");
+          if (badge && countEl) {
+            countEl.textContent = diff;
+            badge.style.display = "inline-flex";
+            setTimeout(() => { badge.style.display = "none"; }, 8000);
+          }
+        }
+        prevPendienteCount = pendienteCount;
+
         updateCounts();
         renderList();
-      } catch(err) {
+      }, err => {
         console.error(err);
         listEl.innerHTML = `<p style="text-align:center;color:var(--rose-deep);padding:40px;">Error cargando reservas.</p>`;
-      }
+      });
     }
 
     function updateCounts() {
@@ -405,12 +438,11 @@
       });
     }
 
-    // ── Renderizar lista ──────────────────────────────────────────
+    // ── Renderizar lista ──────────────────────────────────────────────────────
     function renderList() {
       const list = allRes.filter(r =>
         r.status === curStatus && (!dateFilter || r.date === dateFilter)
       );
-
       if (!list.length) {
         const icons = { pendiente:"🎉", confirmada:"📅", cancelada:"🚫" };
         listEl.innerHTML = `<div class="admin-empty">
@@ -421,28 +453,24 @@
         </div>`;
         return;
       }
-
       listEl.innerHTML = "";
       list.forEach((res, i) => {
         const card = document.createElement("div");
         card.className = "reservation-card";
         card.style.animationDelay = `${i*0.05}s`;
 
-        const pIcon = res.payment === "efectivo" ? "💵" : "💳";
-        const pStr  = res.payment === "efectivo" ? "Efectivo" : "Virtual";
-
-        // Teléfono como enlace de llamada si existe
-        const phoneHtml = res.phone
+        const pIcon = res.payment === "efectivo" ? "💵" : "📱";
+        const pStr  = res.payment === "efectivo" ? "Efectivo" : "Nequi / Daviplata";
+        const clientName = res.clientName || res.client || "Sin nombre";
+        const phoneHtml  = res.phone
           ? `<a href="tel:${res.phone}" class="phone-link">📞 ${res.phone}</a>`
           : `<span style="color:var(--text-light);font-size:13px;">Sin teléfono</span>`;
-
-        const clientName = res.clientName || res.client || null;
 
         card.innerHTML = `
           <div class="res-top">
             <div>
               <p class="res-service">${res.service || "Servicio"}</p>
-              ${clientName ? `<p class="res-client">👤 ${clientName}</p>` : ""}
+              <p class="res-client">👤 ${clientName}</p>
               <p class="res-specialist">👩‍💼 ${res.specialist || "Sin asignar"}</p>
             </div>
             <span class="status-badge badge-${res.status}">${res.status}</span>
@@ -469,8 +497,6 @@
               <span class="res-item-value">${phoneHtml}</span>
             </div>
           </div>
-
-          <!-- ✅ Acciones flexibles — siempre visibles para todos los estados -->
           <div class="res-actions">
             <button class="action-btn btn-confirmar"
               data-id="${res.id}" data-action="confirmada"
@@ -487,37 +513,67 @@
               ${res.status === "cancelada" ? "disabled" : ""}>
               ✕ Cancelar
             </button>
-          </div>
-        `;
+          </div>`;
         listEl.appendChild(card);
       });
 
-      // Eventos de los botones de acción
+      // Eventos botones
       listEl.querySelectorAll(".action-btn:not(:disabled)").forEach(btn => {
         btn.onclick = () => changeStatus(btn.dataset.id, btn.dataset.action, btn);
       });
     }
 
-    // ── Cambiar estado — cualquier estado a cualquier estado ──────
+    // ══════════════════════════════════════════════════════════════════════════
+    // ✅ CAMBIAR ESTADO + NOTIFICAR A LA CLIENTA
+    // ══════════════════════════════════════════════════════════════════════════
     async function changeStatus(id, newStatus, btn) {
       const actions = btn.closest(".res-actions");
       const prev    = actions.innerHTML;
       actions.innerHTML = `<p style="font-size:13px;color:var(--text-light);padding:6px;">Guardando...</p>`;
 
       try {
-        await updateDoc(doc(db,"reservations",id), { status: newStatus });
-        const idx = allRes.findIndex(r => r.id === id);
-        if (idx > -1) allRes[idx].status = newStatus;
-        updateCounts();
-        renderList();
+        await updateDoc(doc(db, "reservations", id), { status: newStatus });
+
+        // ✅ Si se CONFIRMÓ → notificar a la clienta
+        if (newStatus === "confirmada") {
+          const res = allRes.find(r => r.id === id);
+          if (res) {
+            // Email automático a la clienta (si tiene email)
+            await notifyClientEmail({
+              clientEmail: res.userEmail,
+              clientName:  res.clientName || res.client || "Clienta",
+              service:     res.service,
+              date:        fmtDate(res.date),
+              time:        fmtTime(res.time),
+              specialist:  res.specialist || "—",
+            });
+
+            // Abrir WhatsApp con mensaje pre-escrito para la clienta
+            if (res.phone) {
+              const waUrl = buildClientWhatsAppUrl({
+                phone:      res.phone,
+                clientName: res.clientName || res.client || "Clienta",
+                service:    res.service,
+                date:       fmtDate(res.date),
+                time:       fmtTime(res.time),
+                specialist: res.specialist || "—",
+              });
+              window.open(waUrl, "_blank");
+              showToast("✅ Cita confirmada. Se abrió WhatsApp para notificar a la clienta 💅");
+            } else {
+              showToast("✅ Cita confirmada. Email enviado a la clienta 💅");
+            }
+          }
+        }
+        // onSnapshot actualiza la lista automáticamente
       } catch(err) {
         console.error(err);
         actions.innerHTML = prev;
-        alert("Error al actualizar. Intenta de nuevo.");
+        showToast("❌ Error al actualizar. Intenta de nuevo.");
       }
     }
 
-    // ── Tabs ──────────────────────────────────────────────────────
+    // ── Tabs ──────────────────────────────────────────────────────────────────
     document.querySelectorAll(".tab-btn").forEach(btn => btn.onclick = () => {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
@@ -527,13 +583,16 @@
 
     filterDate.onchange = () => {
       dateFilter = filterDate.value || null;
+      prevPendienteCount = -1;
       updateCounts(); renderList();
     };
     document.getElementById("btn-show-all").onclick = () => {
-      filterDate.value = ""; dateFilter = null; updateCounts(); renderList();
+      filterDate.value = ""; dateFilter = null;
+      prevPendienteCount = -1;
+      updateCounts(); renderList();
     };
 
-    // ── Helpers ───────────────────────────────────────────────────
+    // ── Helpers ───────────────────────────────────────────────────────────────
     function fmtDate(s) {
       if (!s) return "—";
       const [y,m,d] = s.split("-");
