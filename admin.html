@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="css/style.css">
   <style>
     .admin-wrap {
-      max-width: 720px; margin: 0 auto;
+      max-width: 760px; margin: 0 auto;
       padding: 0 clamp(16px,4vw,40px) 80px;
       position: relative; z-index: 1;
     }
@@ -90,12 +90,15 @@
       cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;
     }
     .tab-btn.active { background: var(--rose-deep); border-color: var(--rose-deep); color: white; }
+    /* Tab especial para papelera */
+    .tab-btn[data-status="eliminada"].active { background: #78909c; border-color: #78909c; }
     .tab-count {
       display: inline-flex; align-items: center; justify-content: center;
       min-width: 18px; height: 18px; border-radius: 50%;
       background: rgba(255,255,255,0.25); font-size: 10px; padding: 0 4px;
     }
     .tab-btn:not(.active) .tab-count { background: var(--rose-pale); color: var(--rose-deep); }
+    .tab-btn[data-status="eliminada"]:not(.active) .tab-count { background: #eceff1; color: #78909c; }
 
     /* Filtro */
     .filter-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -106,6 +109,15 @@
       background: var(--nude-pale); color: var(--text-dark); outline: none;
     }
 
+    /* Info papelera */
+    .trash-info {
+      display: none; background: #f5f5f5; border: 1px solid #e0e0e0;
+      border-radius: var(--radius-sm); padding: 10px 16px;
+      font-size: 12px; color: #78909c; margin-bottom: 16px;
+      align-items: center; gap: 8px;
+    }
+    .trash-info.visible { display: flex; }
+
     /* Reservation cards */
     .reservation-card {
       background: white; border-radius: var(--radius-md);
@@ -115,6 +127,12 @@
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .reservation-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(44,31,34,0.1); }
+    /* Estilo especial para papelera */
+    .reservation-card.in-trash {
+      border-color: #e0e0e0; opacity: 0.75;
+    }
+    .reservation-card.in-trash:hover { opacity: 1; }
+
     .res-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
     .res-service { font-family: var(--font-display); font-size: 22px; font-weight: 400; color: var(--text-dark); line-height: 1.1; }
     .res-client { font-size: 13px; color: var(--text-mid); margin-top: 3px; }
@@ -126,6 +144,8 @@
     .badge-pendiente  { background: var(--gold-pale);  color: var(--nude-deep); }
     .badge-confirmada { background: #e8f5e9;            color: #388e3c; }
     .badge-cancelada  { background: var(--rose-pale);   color: var(--rose-deep); }
+    .badge-eliminada  { background: #eceff1;            color: #78909c; }
+
     .res-grid {
       display: grid; grid-template-columns: repeat(2,1fr); gap: 10px 20px; margin-bottom: 18px;
     }
@@ -138,7 +158,7 @@
     /* Acciones */
     .res-actions { display: flex; gap: 8px; flex-wrap: wrap; }
     .action-btn {
-      flex: 1; min-width: 90px; padding: 9px 8px;
+      flex: 1; min-width: 80px; padding: 9px 8px;
       border-radius: var(--radius-sm); font-family: var(--font-body);
       font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
       cursor: pointer; border: 1px solid transparent; transition: all 0.2s;
@@ -150,6 +170,36 @@
     .btn-cancelar:hover:not(:disabled)   { background: var(--rose-soft); }
     .btn-pendiente  { background: var(--gold-pale); color: var(--nude-deep); border-color: rgba(212,184,150,0.4); }
     .btn-pendiente:hover:not(:disabled)  { background: #ede0c4; }
+
+    /* Botón eliminar (papelera) */
+    .btn-trash {
+      flex: 0 0 auto; min-width: 40px; padding: 9px 12px;
+      border-radius: var(--radius-sm); font-family: var(--font-body);
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      border: 1px solid rgba(120,144,156,0.3); background: #eceff1; color: #78909c;
+      transition: all 0.2s;
+    }
+    .btn-trash:hover { background: #cfd8dc; color: #546e7a; transform: scale(1.05); }
+
+    /* Botón restaurar desde papelera */
+    .btn-restore {
+      flex: 1; padding: 9px 8px;
+      border-radius: var(--radius-sm); font-family: var(--font-body);
+      font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
+      cursor: pointer; border: 1px solid rgba(212,184,150,0.35);
+      background: var(--nude-pale); color: var(--text-mid); transition: all 0.2s;
+    }
+    .btn-restore:hover { background: var(--gold-pale); border-color: var(--nude); }
+
+    /* Botón borrar permanente */
+    .btn-delete-perm {
+      flex: 0 0 auto; padding: 9px 14px;
+      border-radius: var(--radius-sm); font-family: var(--font-body);
+      font-size: 11px; font-weight: 500; letter-spacing: 0.06em;
+      cursor: pointer; border: 1px solid rgba(211,47,47,0.3);
+      background: #ffebee; color: #c62828; transition: all 0.2s;
+    }
+    .btn-delete-perm:hover { background: #ffcdd2; }
 
     /* Botón WhatsApp en card */
     .btn-wa-confirm {
@@ -193,11 +243,17 @@
     .admin-empty p { font-size: 14px; font-weight: 300; }
     .admin-loading { text-align: center; padding: 50px; color: var(--text-light); font-size: 14px; }
 
+    /* Fecha expiración papelera */
+    .trash-expire {
+      font-size: 10px; color: #90a4ae; margin-top: 6px;
+      font-style: italic;
+    }
+
     /* Mobile */
     @media(max-width:480px) {
       .res-grid { grid-template-columns: 1fr; }
       .res-actions { flex-direction: column; }
-      .action-btn, .btn-wa-confirm { min-width: unset; width: 100%; }
+      .action-btn, .btn-wa-confirm, .btn-restore, .btn-delete-perm { min-width: unset; width: 100%; }
     }
   </style>
 </head>
@@ -205,12 +261,14 @@
   <div class="bg-orb bg-orb--1"></div>
   <div class="bg-orb bg-orb--2"></div>
 
+  <!-- FIX: Header con navegación completa -->
   <header class="site-header">
     <div class="header-inner">
-      <a href="index.html" class="logo-mark">WSN</a>
+      <a href="home.html" class="logo-mark">WSN</a>
       <nav class="header-nav">
-        <a href="index.html">Inicio</a>
+        <a href="home.html">Inicio</a>
         <a href="services.html">Servicios</a>
+        <a href="careers.html">Trabaja con nosotras</a>
         <span class="nav-current">Admin</span>
       </nav>
     </div>
@@ -235,7 +293,7 @@
       <input type="email"    class="login-field" id="login-email"    placeholder="Correo electrónico">
       <input type="password" class="login-field" id="login-password" placeholder="Contraseña">
       <div class="login-error" id="login-error"></div>
-      <button class="btn-primary btn-full" id="btn-email-login" style="margin-top:0;">Entrar</button>
+      <button class="btn-primary btn-full" id="btn-email-login">Entrar</button>
     </div>
   </div>
 
@@ -265,6 +323,11 @@
       <button class="btn-ghost" id="btn-show-all" style="padding:8px 16px;font-size:12px;">Ver todas</button>
     </div>
 
+    <!-- Info papelera -->
+    <div id="trash-info" class="trash-info">
+      🗑️ Las citas en la papelera se eliminan automáticamente después de 30 días.
+    </div>
+
     <div class="admin-tabs">
       <button class="tab-btn active" data-status="pendiente">
         Pendientes <span class="tab-count" id="cnt-pendiente">0</span>
@@ -274,6 +337,9 @@
       </button>
       <button class="tab-btn" data-status="cancelada">
         Canceladas <span class="tab-count" id="cnt-cancelada">0</span>
+      </button>
+      <button class="tab-btn" data-status="eliminada">
+        🗑️ Papelera <span class="tab-count" id="cnt-eliminada">0</span>
       </button>
     </div>
 
@@ -291,13 +357,12 @@
   <script type="module">
     import { initializeApp, getApps, getApp }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getFirestore, collection, doc, updateDoc, query, orderBy, onSnapshot }
+    import { getFirestore, collection, doc, updateDoc, deleteDoc,
+             query, orderBy, onSnapshot, Timestamp }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, signInWithPopup,
              GoogleAuthProvider, signOut, onAuthStateChanged }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-    import { notifyClientEmail, buildClientWhatsAppUrl }
-      from "./js/notifications.js";
 
     const firebaseConfig = {
       apiKey:            "AIzaSyDFsFLw518RovvIPGcIzFDrih4oKBKgz-o",
@@ -325,33 +390,88 @@
     let curStatus  = "pendiente";
     let dateFilter = null;
     let unsubRes   = null;
-    let prevPendienteCount = -1; // para detectar reservas nuevas
+    let prevPendienteCount = -1;
 
-    // Hoy por defecto
+    // Fecha hoy por defecto
     const now = new Date();
     filterDate.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
     dateFilter = filterDate.value;
 
-    // ── Toast helper ──────────────────────────────────────────────────────────
+    // ── Toast ──────────────────────────────────────────────────────────────────
     function showToast(msg, duration = 4000) {
       toastEl.textContent = msg;
       toastEl.classList.add("admin-toast--show");
       setTimeout(() => toastEl.classList.remove("admin-toast--show"), duration);
     }
 
-    // ── Sonido de notificación ────────────────────────────────────────────────
+    /* ════════════════════════════════════════════════════════════════════════
+       SONIDO ESPECIAL PARA NUEVA CITA — melodía tipo "campanita de spa"
+       Usa Web Audio API con 3 notas suaves
+    ════════════════════════════════════════════════════════════════════════ */
     function playNotifSound() {
       try {
         const ctx  = new (window.AudioContext || window.webkitAudioContext)();
-        const osc  = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.frequency.setValueAtTime(880, ctx.currentTime);
-        osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.3, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-        osc.start(); osc.stop(ctx.currentTime + 0.4);
-      } catch(e) { /* silencioso si no hay contexto de audio */ }
+        // Secuencia: La4 → Do#5 → Mi5 (acorde mayor suave)
+        const notes = [440, 554.37, 659.25];
+        notes.forEach((freq, i) => {
+          const osc  = ctx.createOscillator();
+          const gain = ctx.createGain();
+          // Reverb suave con convolver sería ideal pero con gain hacemos fade
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.18);
+          gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.18);
+          gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + i * 0.18 + 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.55);
+          osc.start(ctx.currentTime + i * 0.18);
+          osc.stop(ctx.currentTime + i * 0.18 + 0.6);
+        });
+      } catch(e) { /* silencioso en entornos sin audio */ }
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       NOTIFICACIÓN POR CORREO — EmailJS (se activa al llegar una cita nueva)
+       Configurar NOTIFY_CONFIG en js/notifications.js con tu EmailJS key
+    ════════════════════════════════════════════════════════════════════════ */
+    async function notifyAdminByEmail(res) {
+      // Carga EmailJS dinámicamente solo cuando se necesita
+      try {
+        if (!window.emailjs) {
+          await new Promise((resolve, reject) => {
+            const s = document.createElement("script");
+            s.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
+            s.onload  = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+          });
+        }
+        // Si el key no está configurado, solo logear (no romper)
+        const EMAILJS_PUBLIC_KEY    = "TU_PUBLIC_KEY";      // ← reemplaza
+        const EMAILJS_SERVICE_ID    = "TU_SERVICE_ID";      // ← reemplaza
+        const EMAILJS_TEMPLATE_ADMIN = "wsn_admin_nueva_cita"; // ← reemplaza
+
+        if (EMAILJS_PUBLIC_KEY === "TU_PUBLIC_KEY") {
+          console.info("📧 EmailJS no configurado — configura las claves en admin.html");
+          return;
+        }
+
+        window.emailjs.init(EMAILJS_PUBLIC_KEY);
+        await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ADMIN, {
+          to_email:   AUTHORIZED_EMAIL,
+          service:    res.service,
+          clientName: res.clientName || res.client || "Sin nombre",
+          phone:      res.phone || "—",
+          date:       fmtDate(res.date),
+          time:       fmtTime(res.time),
+          specialist: res.specialist || "—",
+          payment:    res.payment === "efectivo" ? "💵 Efectivo" : "📱 Nequi / Daviplata",
+          admin_url:  `${window.location.origin}/admin.html`,
+        });
+        console.log("✅ Email admin enviado");
+      } catch(e) {
+        console.warn("EmailJS error:", e);
+      }
     }
 
     // ── Auth ──────────────────────────────────────────────────────────────────
@@ -362,9 +482,10 @@
         document.getElementById("admin-user-name").textContent = user.displayName || user.email;
         const av = document.getElementById("admin-avatar");
         av.innerHTML = user.photoURL ? `<img src="${user.photoURL}" alt="">` : "💅";
-        subscribeReservations(); // ✅ Tiempo real
+        subscribeReservations();
+        autoPurgeTrash(); // ← limpieza automática papelera > 30 días
       } else if (user) {
-        showErr("Este correo no tiene acceso.");
+        showErr("Este correo no tiene acceso al panel.");
         signOut(auth);
       } else {
         loginScreen.style.display = "flex";
@@ -391,10 +512,7 @@
     document.getElementById("btn-signout").onclick = () => signOut(auth);
     function showErr(msg) { loginError.textContent = msg; loginError.style.display = "block"; }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // ✅ TIEMPO REAL — onSnapshot para reservas
-    // La admin ve las nuevas citas al instante sin recargar
-    // ══════════════════════════════════════════════════════════════════════════
+    // ── TIEMPO REAL ───────────────────────────────────────────────────────────
     function subscribeReservations() {
       if (unsubRes) unsubRes();
       listEl.innerHTML = `<div class="admin-loading"><div class="loading-spinner" style="margin:0 auto 12px;"></div>Cargando...</div>`;
@@ -403,17 +521,24 @@
       unsubRes = onSnapshot(q, snap => {
         allRes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-        // Detectar reservas nuevas pendientes → sonido + badge
+        // Detectar nuevas citas pendientes
         const pendienteCount = allRes.filter(r =>
           r.status === "pendiente" && (!dateFilter || r.date === dateFilter)
         ).length;
 
         if (prevPendienteCount !== -1 && pendienteCount > prevPendienteCount) {
           const diff = pendienteCount - prevPendienteCount;
-          playNotifSound();
+          playNotifSound(); // 🎵 Melodía suave de spa
           showToast(`🔔 ${diff} nueva${diff > 1 ? "s" : ""} cita${diff > 1 ? "s" : ""} pendiente${diff > 1 ? "s" : ""}!`);
           document.title = `(${pendienteCount}) Admin · WSN`;
-          const badge = document.getElementById("new-reservations-badge");
+
+          // Email al admin por cada nueva cita
+          const newOnes = allRes
+            .filter(r => r.status === "pendiente" && (!dateFilter || r.date === dateFilter))
+            .slice(-diff);
+          newOnes.forEach(r => notifyAdminByEmail(r));
+
+          const badge   = document.getElementById("new-reservations-badge");
           const countEl = document.getElementById("new-count");
           if (badge && countEl) {
             countEl.textContent = diff;
@@ -422,7 +547,6 @@
           }
         }
         prevPendienteCount = pendienteCount;
-
         updateCounts();
         renderList();
       }, err => {
@@ -432,32 +556,44 @@
     }
 
     function updateCounts() {
-      ["pendiente","confirmada","cancelada"].forEach(s => {
-        document.getElementById(`cnt-${s}`).textContent =
-          allRes.filter(r => r.status === s && (!dateFilter || r.date === dateFilter)).length;
+      ["pendiente","confirmada","cancelada","eliminada"].forEach(s => {
+        const el = document.getElementById(`cnt-${s}`);
+        if (el) el.textContent = allRes.filter(r =>
+          r.status === s && (!dateFilter || r.date === dateFilter)
+        ).length;
       });
     }
 
     // ── Renderizar lista ──────────────────────────────────────────────────────
     function renderList() {
+      // Mostrar / ocultar info de papelera
+      const trashInfo = document.getElementById("trash-info");
+      if (trashInfo) trashInfo.classList.toggle("visible", curStatus === "eliminada");
+
       const list = allRes.filter(r =>
         r.status === curStatus && (!dateFilter || r.date === dateFilter)
       );
+
       if (!list.length) {
-        const icons = { pendiente:"🎉", confirmada:"📅", cancelada:"🚫" };
+        const icons = { pendiente:"🎉", confirmada:"📅", cancelada:"🚫", eliminada:"🗑️" };
+        const msgs  = {
+          pendiente: "No hay reservas pendientes",
+          confirmada:"No hay reservas confirmadas",
+          cancelada: "No hay reservas canceladas",
+          eliminada: "La papelera está vacía",
+        };
         listEl.innerHTML = `<div class="admin-empty">
           <div class="admin-empty-icon">${icons[curStatus]}</div>
-          <p>No hay reservas ${curStatus === "pendiente" ? "pendientes"
-            : curStatus === "confirmada" ? "confirmadas" : "canceladas"}
-            ${dateFilter ? "para este día." : "aún."}</p>
+          <p>${msgs[curStatus]}${dateFilter ? " para este día." : " aún."}</p>
         </div>`;
         return;
       }
+
       listEl.innerHTML = "";
       list.forEach((res, i) => {
         const card = document.createElement("div");
-        card.className = "reservation-card";
-        card.style.animationDelay = `${i*0.05}s`;
+        card.className = "reservation-card" + (res.status === "eliminada" ? " in-trash" : "");
+        card.style.animationDelay = `${i * 0.05}s`;
 
         const pIcon = res.payment === "efectivo" ? "💵" : "📱";
         const pStr  = res.payment === "efectivo" ? "Efectivo" : "Nequi / Daviplata";
@@ -466,12 +602,24 @@
           ? `<a href="tel:${res.phone}" class="phone-link">📞 ${res.phone}</a>`
           : `<span style="color:var(--text-light);font-size:13px;">Sin teléfono</span>`;
 
+        // Calcular fecha de expiración para papelera
+        let trashExpireHtml = "";
+        if (res.status === "eliminada" && res.deletedAt) {
+          const deletedMs  = res.deletedAt?.seconds
+            ? res.deletedAt.seconds * 1000
+            : new Date(res.deletedAt).getTime();
+          const expireDate = new Date(deletedMs + 30 * 24 * 60 * 60 * 1000);
+          const daysLeft   = Math.ceil((expireDate - Date.now()) / (1000 * 60 * 60 * 24));
+          trashExpireHtml  = `<p class="trash-expire">🗑️ Se borrará automáticamente en ${daysLeft} día${daysLeft !== 1 ? "s" : ""}</p>`;
+        }
+
         card.innerHTML = `
           <div class="res-top">
             <div>
               <p class="res-service">${res.service || "Servicio"}</p>
               <p class="res-client">👤 ${clientName}</p>
               <p class="res-specialist">👩‍💼 ${res.specialist || "Sin asignar"}</p>
+              ${trashExpireHtml}
             </div>
             <span class="status-badge badge-${res.status}">${res.status}</span>
           </div>
@@ -497,73 +645,139 @@
               <span class="res-item-value">${phoneHtml}</span>
             </div>
           </div>
-          <div class="res-actions">
-            <button class="action-btn btn-confirmar"
-              data-id="${res.id}" data-action="confirmada"
-              ${res.status === "confirmada" ? "disabled" : ""}>
-              ✓ Confirmar
-            </button>
-            <button class="action-btn btn-pendiente"
-              data-id="${res.id}" data-action="pendiente"
-              ${res.status === "pendiente" ? "disabled" : ""}>
-              ⏳ En espera
-            </button>
-            <button class="action-btn btn-cancelar"
-              data-id="${res.id}" data-action="cancelada"
-              ${res.status === "cancelada" ? "disabled" : ""}>
-              ✕ Cancelar
-            </button>
+          <div class="res-actions" id="actions-${res.id}">
+            ${res.status !== "eliminada" ? `
+              <button class="action-btn btn-confirmar"
+                data-id="${res.id}" data-action="confirmada"
+                ${res.status === "confirmada" ? "disabled" : ""}>
+                ✓ Confirmar
+              </button>
+              <button class="action-btn btn-pendiente"
+                data-id="${res.id}" data-action="pendiente"
+                ${res.status === "pendiente" ? "disabled" : ""}>
+                ⏳ En espera
+              </button>
+              <button class="action-btn btn-cancelar"
+                data-id="${res.id}" data-action="cancelada"
+                ${res.status === "cancelada" ? "disabled" : ""}>
+                ✕ Cancelar
+              </button>
+              <!-- Botón papelera -->
+              <button class="btn-trash" data-id="${res.id}" title="Mover a papelera">🗑️</button>
+            ` : `
+              <!-- Papelera: restaurar o borrar definitivamente -->
+              <button class="btn-restore" data-id="${res.id}" data-action="pendiente">
+                ↩ Restaurar como pendiente
+              </button>
+              <button class="btn-delete-perm" data-id="${res.id}">
+                🗑️ Borrar definitivamente
+              </button>
+            `}
           </div>`;
         listEl.appendChild(card);
       });
 
-      // Eventos botones
+      // Eventos acciones normales
       listEl.querySelectorAll(".action-btn:not(:disabled)").forEach(btn => {
         btn.onclick = () => changeStatus(btn.dataset.id, btn.dataset.action, btn);
       });
+
+      // Eventos papelera
+      listEl.querySelectorAll(".btn-trash").forEach(btn => {
+        btn.onclick = () => moveToTrash(btn.dataset.id, btn);
+      });
+
+      // Eventos restaurar desde papelera
+      listEl.querySelectorAll(".btn-restore").forEach(btn => {
+        btn.onclick = () => changeStatus(btn.dataset.id, "pendiente", btn);
+      });
+
+      // Eventos borrar definitivo
+      listEl.querySelectorAll(".btn-delete-perm").forEach(btn => {
+        btn.onclick = () => deleteForever(btn.dataset.id, btn);
+      });
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // ✅ CAMBIAR ESTADO + NOTIFICAR A LA CLIENTA
-    // ══════════════════════════════════════════════════════════════════════════
+    // ── Mover a papelera (marca status = "eliminada" + fecha de eliminación) ──
+    async function moveToTrash(id, btn) {
+      if (!confirm("¿Mover esta cita a la papelera? Se borrará definitivamente en 30 días.")) return;
+      const actions = btn.closest(".res-actions");
+      actions.innerHTML = `<p style="font-size:13px;color:var(--text-light);padding:6px;">Moviendo a papelera...</p>`;
+      try {
+        await updateDoc(doc(db, "reservations", id), {
+          status: "eliminada",
+          deletedAt: new Date().toISOString(),
+        });
+        showToast("🗑️ Cita movida a la papelera. Se borrará en 30 días.");
+      } catch(e) {
+        console.error(e);
+        actions.innerHTML = btn.outerHTML; // restaurar botón
+        showToast("❌ Error al mover a papelera.");
+      }
+    }
+
+    // ── Borrar definitivamente ─────────────────────────────────────────────────
+    async function deleteForever(id, btn) {
+      if (!confirm("¿Segura? Esta acción es permanente y no se puede deshacer.")) return;
+      const actions = btn.closest(".res-actions");
+      actions.innerHTML = `<p style="font-size:13px;color:var(--text-light);padding:6px;">Borrando...</p>`;
+      try {
+        await deleteDoc(doc(db, "reservations", id));
+        showToast("✅ Cita borrada definitivamente.");
+      } catch(e) {
+        console.error(e);
+        showToast("❌ Error al borrar.");
+      }
+    }
+
+    // ── Auto-purga papelera > 30 días ─────────────────────────────────────────
+    async function autoPurgeTrash() {
+      const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      const toDelete = allRes.filter(r =>
+        r.status === "eliminada" && r.deletedAt && r.deletedAt < cutoff
+      );
+      if (!toDelete.length) return;
+      console.log(`🗑️ Auto-purgando ${toDelete.length} cita(s) expiradas de la papelera...`);
+      for (const res of toDelete) {
+        try { await deleteDoc(doc(db, "reservations", res.id)); }
+        catch(e) { console.warn("Error purgando:", e); }
+      }
+      if (toDelete.length) showToast(`🗑️ ${toDelete.length} cita(s) antiguas purgadas de la papelera.`);
+    }
+
+    // ── Cambiar estado normal ─────────────────────────────────────────────────
     async function changeStatus(id, newStatus, btn) {
       const actions = btn.closest(".res-actions");
       const prev    = actions.innerHTML;
       actions.innerHTML = `<p style="font-size:13px;color:var(--text-light);padding:6px;">Guardando...</p>`;
-
       try {
-        await updateDoc(doc(db, "reservations", id), { status: newStatus });
+        const updateData = { status: newStatus };
+        // Al restaurar desde papelera, limpiar deletedAt
+        if (newStatus === "pendiente") updateData.deletedAt = null;
+        await updateDoc(doc(db, "reservations", id), updateData);
 
-        // ✅ Si se CONFIRMÓ → notificar a la clienta
         if (newStatus === "confirmada") {
           const res = allRes.find(r => r.id === id);
-          if (res) {
-            // Email automático a la clienta (si tiene email)
-            await notifyClientEmail({
-              clientEmail: res.userEmail,
-              clientName:  res.clientName || res.client || "Clienta",
-              service:     res.service,
-              date:        fmtDate(res.date),
-              time:        fmtTime(res.time),
-              specialist:  res.specialist || "—",
-            });
-
-            // Abrir WhatsApp con mensaje pre-escrito para la clienta
-            if (res.phone) {
-              const waUrl = buildClientWhatsAppUrl({
-                phone:      res.phone,
-                clientName: res.clientName || res.client || "Clienta",
-                service:    res.service,
-                date:       fmtDate(res.date),
-                time:       fmtTime(res.time),
-                specialist: res.specialist || "—",
-              });
-              window.open(waUrl, "_blank");
-              showToast("✅ Cita confirmada. Se abrió WhatsApp para notificar a la clienta 💅");
-            } else {
-              showToast("✅ Cita confirmada. Email enviado a la clienta 💅");
-            }
+          if (res?.phone) {
+            const phone = res.phone.replace(/\D/g,"");
+            const tel   = phone.startsWith("57") ? phone : `57${phone}`;
+            const clientName = res.clientName || res.client || "Clienta";
+            const msg = encodeURIComponent(
+              `¡Hola ${clientName}! 💅\n\n` +
+              `Tu cita en *Women Secret Nails* está ✅ *CONFIRMADA*\n\n` +
+              `📅 *Fecha:* ${fmtDate(res.date)}\n` +
+              `🕐 *Hora:* ${fmtTime(res.time)}\n` +
+              `💅 *Servicio:* ${res.service}\n` +
+              `👩‍💼 *Especialista:* ${res.specialist || "—"}\n\n` +
+              `¡Te esperamos! 🌸`
+            );
+            window.open(`https://wa.me/${tel}?text=${msg}`, "_blank");
+            showToast("✅ Cita confirmada. Se abrió WhatsApp para notificar a la clienta 💅");
+          } else {
+            showToast("✅ Cita confirmada.");
           }
+        } else {
+          showToast(`✅ Estado actualizado: ${newStatus}`);
         }
         // onSnapshot actualiza la lista automáticamente
       } catch(err) {
