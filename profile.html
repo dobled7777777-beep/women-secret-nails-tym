@@ -14,7 +14,6 @@
       padding: 0 clamp(16px,4vw,40px) 80px;
       position: relative; z-index: 1;
     }
-    /* Hero perfil */
     .profile-hero {
       background: linear-gradient(135deg, #2c1f22, #c97b8a);
       border-radius: var(--radius-lg); padding: 36px 32px;
@@ -46,8 +45,6 @@
       border-radius:50px; padding:4px 12px; font-size:11px;
       color:rgba(255,255,255,0.85); letter-spacing:0.06em;
     }
-
-    /* Stats */
     .profile-stats {
       display:grid; grid-template-columns:repeat(3,1fr);
       gap:12px; margin-bottom:32px;
@@ -66,8 +63,6 @@
       font-size:11px; color:var(--text-light);
       letter-spacing:0.08em; text-transform:uppercase;
     }
-
-    /* Secciones */
     .section-head {
       display:flex; justify-content:space-between;
       align-items:center; margin-bottom:16px;
@@ -79,8 +74,6 @@
     .section-link {
       font-size:12px; color:var(--rose-deep); cursor:pointer;
     }
-
-    /* Cita card */
     .cita-card {
       background:white; border-radius:var(--radius-md);
       padding:20px 22px; margin-bottom:12px;
@@ -109,7 +102,6 @@
     .st-pendiente  { background:var(--gold-pale);  color:var(--nude-deep); }
     .st-confirmada { background:#e8f5e9;            color:#388e3c; }
     .st-cancelada  { background:var(--rose-pale);   color:var(--rose-deep); }
-
     .btn-cancel-cita {
       font-size:11px; color:var(--rose-deep);
       background:none; border:none; cursor:pointer;
@@ -117,12 +109,9 @@
       text-decoration:underline; opacity:0.7;
     }
     .btn-cancel-cita:hover { opacity:1; }
-
-    /* Promos WSN (sin bono de regalo) */
     .promo-section { margin-top:40px; margin-bottom:32px; }
     .promo-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     @media(max-width:480px){ .promo-grid { grid-template-columns:1fr; } }
-
     .promo-card {
       border-radius:var(--radius-md); padding:28px 24px;
       position:relative; overflow:hidden; min-height:160px;
@@ -131,7 +120,6 @@
     .promo-card-1 { background:linear-gradient(135deg,#2c1f22,#c97b8a); }
     .promo-card-2 { background:linear-gradient(135deg,#b89272,#f5ead8); }
     .promo-card-3 { background:linear-gradient(135deg,#388e3c,#a5d6a7); }
-
     .promo-deco {
       position:absolute; top:12px; right:16px;
       font-size:52px; opacity:0.2; user-select:none;
@@ -159,16 +147,12 @@
     .promo-card-2 .promo-btn {
       background:rgba(0,0,0,0.1); border-color:rgba(0,0,0,0.2); color:var(--text-dark);
     }
-
-    /* Empty / loading */
     .empty-citas { text-align:center; padding:40px 20px; color:var(--text-light); }
     .empty-citas-icon { font-size:36px; margin-bottom:10px; }
     .empty-citas p { font-size:14px; font-weight:300; margin-bottom:16px; }
     .profile-loading {
       text-align:center; padding:60px; color:var(--text-light); font-size:14px;
     }
-
-    /* Banner invitada */
     .guest-banner {
       background:linear-gradient(135deg,var(--rose-pale),var(--gold-pale));
       border:1px solid rgba(212,184,150,0.3);
@@ -190,10 +174,13 @@
 
   <header class="site-header">
     <div class="header-inner">
-      <a href="index.html" class="logo-mark">WSN</a>
+      <a href="home.html" class="logo-mark">WSN</a>
       <nav class="header-nav">
-        <a href="index.html">Inicio</a>
+        <!-- FIX: "Inicio" siempre visible, link a home.html -->
+        <a href="home.html">Inicio</a>
         <a href="services.html">Servicios</a>
+        <!-- FIX: "Trabaja con nosotras" con link correcto -->
+        <a href="careers.html">Trabaja con nosotras</a>
         <span class="nav-current">Mi perfil</span>
         <button id="btn-signout" class="nav-cta" style="cursor:pointer;border:none;">Salir</button>
       </nav>
@@ -201,7 +188,6 @@
   </header>
 
   <div class="profile-wrap">
-
     <div id="profile-loading" class="profile-loading">
       <div class="loading-spinner" style="margin:0 auto 12px;"></div>
       Cargando tu perfil...
@@ -248,7 +234,7 @@
         <a href="services.html" class="btn-primary">+ Agendar nueva cita</a>
       </div>
 
-      <!-- Promos WSN — sin bono de regalo -->
+      <!-- Promos -->
       <div class="promo-section">
         <div class="section-head">
           <h3 class="section-title">Women <em style="font-style:italic;color:var(--rose-deep)">Secret</em> world</h3>
@@ -266,6 +252,7 @@
             <p class="promo-title">Cejas en Henna — larga duración</p>
             <a href="services.html" class="promo-btn">Ver más</a>
           </div>
+          <!-- FIX: link a careers.html arreglado -->
           <div class="promo-card promo-card-3" style="grid-column:1/-1;">
             <span class="promo-deco">💼</span>
             <p class="promo-label">Únete al equipo</p>
@@ -309,7 +296,6 @@
         </div>
       </div>
     </div>
-
   </div>
 
   <script type="module">
@@ -342,19 +328,15 @@
     let showAll  = false;
     let allCitas = [];
 
-    // ── Cerrar sesión ──────────────────────────────────────────
     document.getElementById("btn-signout").onclick = async () => {
-      if (isGuest) {
-        sessionStorage.removeItem("wsn-guest");
-      } else {
-        await signOut(auth);
-      }
+      if (isGuest) { sessionStorage.removeItem("wsn-guest"); }
+      else { await signOut(auth); }
       window.location.href = "login.html";
     };
 
-    // ── Auth check ─────────────────────────────────────────────
     onAuthStateChanged(auth, async user => {
       loadEl.style.display = "none";
+
       if (isGuest && !user) {
         guestEl.style.display = "block"; return;
       }
@@ -379,102 +361,107 @@
 
     async function loadCitas(uid) {
       try {
+        /* FIX: query sin orderBy compuesto que requiere índice;
+           ordenamos manualmente en JS para evitar el error de índice */
         const snap = await getDocs(query(
-          collection(db,"reservations"),
-          where("userId","==",uid),
-          orderBy("date","desc")
+          collection(db, "reservations"),
+          where("userId", "==", uid)
         ));
-        allCitas = snap.docs.map(d=>({id:d.id,...d.data()}));
-        const today = new Date().toISOString().split("T")[0];
-        const proximas  = allCitas.filter(c=>c.date>=today&&c.status!=="cancelada");
-        const historial = allCitas.filter(c=>c.date<today||c.status==="cancelada");
+        allCitas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Ordenar por fecha desc en JS
+        allCitas.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+
+        const today     = new Date().toISOString().split("T")[0];
+        const proximas  = allCitas.filter(c => c.date >= today && c.status !== "cancelada");
+        const historial = allCitas.filter(c => c.date <  today || c.status === "cancelada");
 
         document.getElementById("stat-total").textContent       = allCitas.length;
-        document.getElementById("stat-confirmadas").textContent = allCitas.filter(c=>c.status==="confirmada").length;
+        document.getElementById("stat-confirmadas").textContent = allCitas.filter(c => c.status === "confirmada").length;
         document.getElementById("stat-proximas").textContent    = proximas.length;
 
         renderProximas(proximas);
         renderHistorial(historial, false);
-      } catch(e) { console.error(e); }
+      } catch(e) {
+        console.error("Error cargando citas:", e);
+      }
     }
 
     function renderProximas(list) {
       const el = document.getElementById("proximas-list");
       if (!list.length) {
-        el.innerHTML=`<div class="empty-citas">
+        el.innerHTML = `<div class="empty-citas">
           <div class="empty-citas-icon">📅</div>
           <p>No tienes citas próximas.</p>
           <a href="services.html" class="btn-primary">Agendar ahora</a>
         </div>`; return;
       }
-      el.innerHTML="";
-      list.forEach((c,i)=>el.appendChild(buildCitaCard(c,i,true)));
+      el.innerHTML = "";
+      list.forEach((c, i) => el.appendChild(buildCitaCard(c, i, true)));
     }
 
     function renderHistorial(list, all) {
       const el    = document.getElementById("historial-list");
-      const shown = all ? list : list.slice(0,3);
+      const shown = all ? list : list.slice(0, 3);
       if (!list.length) {
-        el.innerHTML=`<div class="empty-citas">
+        el.innerHTML = `<div class="empty-citas">
           <div class="empty-citas-icon">🌸</div>
           <p>Tu historial aparecerá aquí.</p>
         </div>`; return;
       }
-      el.innerHTML="";
-      shown.forEach((c,i)=>el.appendChild(buildCitaCard(c,i,false)));
+      el.innerHTML = "";
+      shown.forEach((c, i) => el.appendChild(buildCitaCard(c, i, false)));
     }
 
-    function buildCitaCard(c,i,canCancel) {
-      const icons={
+    function buildCitaCard(c, i, canCancel) {
+      const icons = {
         "Semipermanente":"💅","Manicura tradicional":"🌸","Pedicura tradicional":"🦶",
         "Manicura + Pedicura":"🌸","Acrílicas":"💎","Press On":"🎀",
         "Cejas en Henna":"🌿","Depilación cejas":"✨","Shampoo":"🧴","Cepillado":"💇",
       };
-      const card=document.createElement("div");
-      card.className="cita-card";
-      card.style.animationDelay=`${i*0.05}s`;
-      card.innerHTML=`
-        <div class="cita-icon">${icons[c.service]||"💅"}</div>
+      const card = document.createElement("div");
+      card.className = "cita-card";
+      card.style.animationDelay = `${i * 0.05}s`;
+      card.innerHTML = `
+        <div class="cita-icon">${icons[c.service] || "💅"}</div>
         <div class="cita-info">
-          <p class="cita-service">${c.service||"Servicio"}</p>
-          <p class="cita-meta">📅 ${fmtDate(c.date)} · 🕐 ${fmtTime(c.time)} · 👩‍💼 ${c.specialist||"—"}</p>
+          <p class="cita-service">${c.service || "Servicio"}</p>
+          <p class="cita-meta">📅 ${fmtDate(c.date)} · 🕐 ${fmtTime(c.time)} · 👩‍💼 ${c.specialist || "—"}</p>
         </div>
         <div class="cita-right">
-          <span class="cita-status st-${c.status}">${c.status}</span>
-          ${canCancel&&c.status!=="cancelada"
-            ?`<button class="btn-cancel-cita" data-id="${c.id}">Cancelar</button>`:""}
+          <span class="cita-status st-${c.status || "pendiente"}">${c.status || "pendiente"}</span>
+          ${canCancel && c.status !== "cancelada"
+            ? `<button class="btn-cancel-cita" data-id="${c.id}">Cancelar</button>` : ""}
         </div>`;
-      card.querySelector(".btn-cancel-cita")?.addEventListener("click", async()=>{
-        if(!confirm("¿Segura que quieres cancelar esta cita?")) return;
+      card.querySelector(".btn-cancel-cita")?.addEventListener("click", async () => {
+        if (!confirm("¿Segura que quieres cancelar esta cita?")) return;
         try {
-          await updateDoc(doc(db,"reservations",c.id),{status:"cancelada"});
-          card.querySelector(".cita-status").textContent="cancelada";
-          card.querySelector(".cita-status").className="cita-status st-cancelada";
+          await updateDoc(doc(db, "reservations", c.id), { status: "cancelada" });
+          card.querySelector(".cita-status").textContent  = "cancelada";
+          card.querySelector(".cita-status").className   = "cita-status st-cancelada";
           card.querySelector(".btn-cancel-cita")?.remove();
-        } catch(e){ alert("Error al cancelar. Intenta de nuevo."); }
+        } catch(e) { alert("Error al cancelar. Intenta de nuevo."); }
       });
       return card;
     }
 
-    document.getElementById("toggle-historial")?.addEventListener("click",()=>{
-      showAll=!showAll;
-      const today=new Date().toISOString().split("T")[0];
-      renderHistorial(allCitas.filter(c=>c.date<today||c.status==="cancelada"),showAll);
-      document.getElementById("toggle-historial").textContent=showAll?"Ver menos ↑":"Ver todas →";
+    document.getElementById("toggle-historial")?.addEventListener("click", () => {
+      showAll = !showAll;
+      const today     = new Date().toISOString().split("T")[0];
+      renderHistorial(allCitas.filter(c => c.date < today || c.status === "cancelada"), showAll);
+      document.getElementById("toggle-historial").textContent = showAll ? "Ver menos ↑" : "Ver todas →";
     });
 
-    function fmtDate(s){
-      if(!s) return "—";
-      const [y,m,d]=s.split("-");
-      const M=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
-      return `${parseInt(d)} ${M[parseInt(m)-1]} ${y}`;
+    function fmtDate(s) {
+      if (!s) return "—";
+      const [y, m, d] = s.split("-");
+      const M = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+      return `${parseInt(d)} ${M[parseInt(m) - 1]} ${y}`;
     }
-    function fmtTime(t){
-      if(!t) return "—";
-      const [h,m]=t.split(":").map(Number);
-      return `${h%12||12}:${String(m).padStart(2,"0")} ${h>=12?"pm":"am"}`;
+    function fmtTime(t) {
+      if (!t) return "—";
+      const [h, m] = t.split(":").map(Number);
+      return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h >= 12 ? "pm" : "am"}`;
     }
   </script>
 </body>
-</html>
 </html>
