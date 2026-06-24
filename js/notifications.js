@@ -11,7 +11,7 @@
 export const NOTIFY_CONFIG = {
   emailjs: {
     publicKey:        "TU_PUBLIC_KEY",          // EmailJS > Account > API Keys
-    serviceId:        "TU_SERVICE_ID",          // EmailJS > Email Services
+    serviceId:        "service_rgenrgj",          // EmailJS > Email Services
     adminTemplateId:  "wsn_admin_nueva_cita",   // nombre que pondrás al template
     clientTemplateId: "wsn_cliente_confirmada", // nombre que pondrás al template
   },
