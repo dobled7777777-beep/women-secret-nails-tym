@@ -10,7 +10,7 @@
 // ══════════════════════════════════════════════════
 export const NOTIFY_CONFIG = {
   emailjs: {
-    publicKey:        "TU_PUBLIC_KEY",          // EmailJS > Account > API Keys
+    publicKey:        "FfOnIphvjFABGNa2O",          // EmailJS > Account > API Keys
     serviceId:        "service_rgenrgj",          // EmailJS > Email Services
     adminTemplateId:  "wsn_admin_nueva_cita",   // nombre que pondrás al template
     clientTemplateId: "wsn_cliente_confirmada", // nombre que pondrás al template
