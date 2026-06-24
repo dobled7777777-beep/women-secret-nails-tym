@@ -22,6 +22,8 @@
     .client-avatar img { width:100%; height:100%; object-fit:cover; }
     .client-name-nav { font-size:13px; color:var(--text-mid); font-weight:400; }
     @media(max-width:480px){ .client-name-nav { display:none; } }
+
+    /* Badge invitada */
     .guest-nav-badge { font-size:11px; color:var(--text-light); letter-spacing:0.04em; }
     .guest-nav-badge a { color:var(--rose-deep); font-weight:500; text-decoration:none; }
     .guest-nav-badge a:hover { text-decoration:underline; }
@@ -36,9 +38,7 @@
       margin-top: 14px;
       animation: fadeUp 0.3s forwards;
     }
-    .nequi-header {
-      display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
-    }
+    .nequi-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
     .nequi-icon { font-size: 28px; flex-shrink: 0; }
     .nequi-info { flex: 1; }
     .nequi-label {
@@ -57,14 +57,8 @@
       white-space: nowrap; flex-shrink: 0;
     }
     .nequi-copy:hover { background: #2e7d32; transform: translateY(-1px); }
-    .nequi-hint {
-      font-size: 12px; color: #388e3c; line-height: 1.6;
-      font-weight: 300; margin-top: 4px;
-    }
-    .nequi-name {
-      font-size: 12px; color: #388e3c; font-weight: 500;
-      margin-top: 6px;
-    }
+    .nequi-hint { font-size: 12px; color: #388e3c; line-height: 1.6; font-weight: 300; margin-top: 4px; }
+    .nequi-name { font-size: 12px; color: #388e3c; font-weight: 500; margin-top: 6px; }
 
     /* ── Botón WhatsApp ── */
     .btn-whatsapp {
@@ -92,12 +86,15 @@
   <div class="bg-orb bg-orb--1"></div>
   <div class="bg-orb bg-orb--2"></div>
 
+  <!-- ══ HEADER — FIX: nav completo con Inicio + Trabaja con nosotras ══ -->
   <header class="site-header">
     <div class="header-inner">
-      <a href="index.html" class="logo-mark">WSN</a>
+      <a href="home.html" class="logo-mark">WSN</a>
       <nav class="header-nav">
-        <a href="index.html">Inicio</a>
+        <a href="home.html">Inicio</a>
         <span class="nav-current">Servicios</span>
+        <a href="careers.html">Trabaja con nosotras</a>
+        <!-- slot: se llena con JS según auth state -->
         <div id="client-nav-slot"></div>
       </nav>
     </div>
@@ -125,7 +122,7 @@
         <div>
           <p class="modal-eyebrow">Reservar</p>
           <h2 class="modal-title" id="modal-service-name">Servicio</h2>
-          <p class="modal-meta"  id="modal-service-meta"></p>
+          <p class="modal-meta" id="modal-service-meta"></p>
         </div>
         <button id="close-modal" class="modal-close" aria-label="Cerrar">&times;</button>
       </div>
@@ -190,7 +187,6 @@
       <div class="modal-step hidden" id="step-4">
         <h3 class="step-title">¿Cómo prefieres pagar?</h3>
         <div class="payment-options">
-
           <label class="payment-option">
             <input type="radio" name="payment" value="efectivo">
             <div class="payment-card">
@@ -199,7 +195,6 @@
               <span class="payment-desc">Pagas el día de tu cita</span>
             </div>
           </label>
-
           <label class="payment-option">
             <input type="radio" name="payment" value="nequi">
             <div class="payment-card">
@@ -208,10 +203,8 @@
               <span class="payment-desc">Transfiere antes de tu cita</span>
             </div>
           </label>
-
         </div>
 
-        <!-- Panel de datos Nequi — aparece al seleccionar pago virtual -->
         <div id="nequi-panel" class="nequi-panel">
           <div class="nequi-header">
             <span class="nequi-icon">📱</span>
@@ -286,8 +279,6 @@
             Te avisaremos cuando esté confirmada 💅
           </p>
           <div style="display:flex;flex-direction:column;gap:10px;width:100%;">
-
-            <!-- Botón enviar comprobante Nequi (solo aparece si pagó virtual) -->
             <div id="comprobante-btn-wrap" style="display:none;">
               <a id="comprobante-wa-btn" href="#" target="_blank" class="btn-whatsapp">
                 📲 Enviar comprobante por WhatsApp
@@ -296,7 +287,6 @@
                 Envía la captura de tu transferencia para confirmar el pago
               </p>
             </div>
-
             <a href="profile.html" class="btn-primary" style="text-align:center;">Ver mis citas →</a>
             <button class="btn-ghost btn-full" id="close-success">Seguir viendo servicios</button>
           </div>
