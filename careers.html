@@ -165,6 +165,8 @@
     }
     .apply-textarea { resize: vertical; min-height: 110px; }
     .apply-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b89aa0' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px; }
+    .role-other-wrap { display: none; grid-column: 1 / -1; }
+    .role-other-wrap.visible { display: block; animation: fadeUp 0.25s forwards; }
 
     .apply-success {
       display: none; text-align: center; padding: 32px 0 8px;
@@ -311,6 +313,10 @@
               <option value="Otro">Otro / Cuéntame más</option>
             </select>
           </div>
+          <div class="role-other-wrap" id="role-other-wrap">
+            <label class="apply-label" for="ap-role-other">Cuéntame más</label>
+            <input type="text" id="ap-role-other" class="apply-input" placeholder="Ej: atención al cliente, maquillaje, ventas, recepción...">
+          </div>
           <div>
             <label class="apply-label" for="ap-exp">Años de experiencia</label>
             <select id="ap-exp" class="apply-select">
@@ -358,6 +364,7 @@
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { notifyApplicationEmail } from "./js/notifications.js";
 
     const firebaseConfig = {
       apiKey:            "AIzaSyDFsFLw518RovvIPGcIzFDrih4oKBKgz-o",
@@ -396,17 +403,24 @@
       }
     });
 
+    document.getElementById("ap-role")?.addEventListener("change", e => {
+      const wrap = document.getElementById("role-other-wrap");
+      wrap?.classList.toggle("visible", e.target.value === "Otro");
+    });
+
     // Formulario
     document.getElementById("apply-btn")?.addEventListener("click", async () => {
       const name  = document.getElementById("ap-name").value.trim();
       const phone = document.getElementById("ap-phone").value.trim();
       const role  = document.getElementById("ap-role").value;
+      const roleOther = document.getElementById("ap-role-other").value.trim();
       const exp   = document.getElementById("ap-exp").value;
       const msg   = document.getElementById("ap-msg").value.trim();
       const errEl = document.getElementById("apply-error");
+      const finalRole = role === "Otro" ? roleOther : role;
 
       errEl.style.display = "none";
-      if (!name || !phone || !role || !exp) {
+      if (!name || !phone || !role || !exp || (role === "Otro" && !roleOther)) {
         errEl.textContent = "Por favor completa todos los campos obligatorios.";
         errEl.style.display = "block"; return;
       }
@@ -416,8 +430,15 @@
 
       try {
         await addDoc(collection(db, "applications"), {
-          name, phone, role, experience: exp, message: msg,
+          name, phone, role: finalRole, experience: exp, message: msg,
           status: "nueva", createdAt: serverTimestamp()
+        });
+        notifyApplicationEmail({
+          name,
+          phone,
+          role: finalRole,
+          experience: exp,
+          message: msg || "Sin mensaje adicional",
         });
         document.getElementById("apply-form").style.display    = "none";
         document.getElementById("apply-success").style.display = "block";
@@ -425,7 +446,7 @@
         // WhatsApp automático al admin
         const waMsg = encodeURIComponent(
           `💼 *Nueva postulación WSN!*\n\n` +
-          `👤 ${name}\n📞 ${phone}\n💅 ${role}\n⏱ Exp: ${exp}\n\n${msg ? `"${msg}"` : ""}`
+          `👤 ${name}\n📞 ${phone}\n💅 ${finalRole}\n⏱ Exp: ${exp}\n\n${msg ? `"${msg}"` : ""}`
         );
         window.open(`https://wa.me/573017886217?text=${waMsg}`, "_blank");
       } catch(e) {

@@ -214,22 +214,21 @@ document.addEventListener("DOMContentLoaded", () => {
   function openWallet(appName) {
     const amount = parseInt(String(bk.servicePrice || "").replace(/\D/g, ""), 10);
     const note = encodeURIComponent(`Women Secret Nails - ${bk.serviceName || "Reserva"}`);
-    const urls = appName === "nequi"
-      ? [
-          `nequi://send?phone=${WALLET_PHONE}${amount ? `&amount=${amount}` : ""}&description=${note}`,
-          "nequi://app"
-        ]
-      : [
-          `daviplata://send?phone=${WALLET_PHONE}${amount ? `&amount=${amount}` : ""}&description=${note}`,
-          "daviplata://app"
-        ];
+    const walletName = appName === "nequi" ? "Nequi" : "Daviplata";
+    const url = appName === "nequi"
+      ? `nequi://send?phone=${WALLET_PHONE}${amount ? `&amount=${amount}` : ""}&description=${note}`
+      : `daviplata://send?phone=${WALLET_PHONE}${amount ? `&amount=${amount}` : ""}&description=${note}`;
 
-    window.location.href = urls[0];
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    if (!opened) {
+      navigator.clipboard?.writeText(WALLET_PHONE);
+      showToast(`Tu navegador bloqueó ${walletName}. Copié el número ${WALLET_PHONE}.`);
+      return;
+    }
+
     setTimeout(() => {
-      if (document.hidden) return;
-      window.location.href = urls[1];
-      showToast(`Si ${appName === "nequi" ? "Nequi" : "Daviplata"} no se abre, paga al ${WALLET_PHONE}.`);
-    }, 900);
+      showToast(`Cuando termines en ${walletName}, vuelve aquí para confirmar tu cita.`);
+    }, 700);
   }
 
   openNequiBtn?.addEventListener("click", () => openWallet("nequi"));

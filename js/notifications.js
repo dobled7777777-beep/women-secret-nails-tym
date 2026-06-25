@@ -30,6 +30,8 @@ export const NOTIFY_CONFIG = {
 
     clientTemplateId: "wsn_cliente_confirmada", // nombre que pondrás al template
 
+    applicationTemplateId: "wsn_admin_postulacion",
+
   },
 
   callmebot: {
@@ -205,6 +207,58 @@ export async function notifyClientEmail(data) {
   } catch(e) {
 
     console.warn("EmailJS cliente error:", e);
+
+  }
+
+}
+
+
+
+// ── 3. Email al ADMIN cuando llega una postulación ───────────────────────────
+
+export async function notifyApplicationEmail(data) {
+
+  // data: { name, phone, role, experience, message }
+
+  await loadEmailJS();
+
+  if (!window.emailjs) return;
+
+  if (NOTIFY_CONFIG.emailjs.publicKey === "TU_PUBLIC_KEY") return;
+
+  try {
+
+    await window.emailjs.send(
+
+      NOTIFY_CONFIG.emailjs.serviceId,
+
+      NOTIFY_CONFIG.emailjs.applicationTemplateId,
+
+      {
+
+        to_email:   NOTIFY_CONFIG.business.adminEmail,
+
+        name:       data.name,
+
+        phone:      data.phone,
+
+        role:       data.role,
+
+        experience: data.experience,
+
+        message:    data.message,
+
+        admin_url:  `${window.location.origin}/admin.html`,
+
+      }
+
+    );
+
+    console.log("✅ Email postulación enviado");
+
+  } catch(e) {
+
+    console.warn("EmailJS postulación error:", e);
 
   }
 
