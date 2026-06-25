@@ -431,50 +431,6 @@
       } catch(e) { /* silencioso en entornos sin audio */ }
     }
 
-    /* ════════════════════════════════════════════════════════════════════════
-       NOTIFICACIÓN POR CORREO — EmailJS (se activa al llegar una cita nueva)
-       Configurar NOTIFY_CONFIG en js/notifications.js con tu EmailJS key
-    ════════════════════════════════════════════════════════════════════════ */
-    async function notifyAdminByEmail(res) {
-      // Carga EmailJS dinámicamente solo cuando se necesita
-      try {
-        if (!window.emailjs) {
-          await new Promise((resolve, reject) => {
-            const s = document.createElement("script");
-            s.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
-            s.onload  = resolve;
-            s.onerror = reject;
-            document.head.appendChild(s);
-          });
-        }
-        // Si el key no está configurado, solo logear (no romper)
-        const EMAILJS_PUBLIC_KEY    = "TU_PUBLIC_KEY";      // ← reemplaza
-        const EMAILJS_SERVICE_ID    = "TU_SERVICE_ID";      // ← reemplaza
-        const EMAILJS_TEMPLATE_ADMIN = "wsn_admin_nueva_cita"; // ← reemplaza
-
-        if (EMAILJS_PUBLIC_KEY === "TU_PUBLIC_KEY") {
-          console.info("📧 EmailJS no configurado — configura las claves en admin.html");
-          return;
-        }
-
-        window.emailjs.init(EMAILJS_PUBLIC_KEY);
-        await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ADMIN, {
-          to_email:   AUTHORIZED_EMAIL,
-          service:    res.service,
-          clientName: res.clientName || res.client || "Sin nombre",
-          phone:      res.phone || "—",
-          date:       fmtDate(res.date),
-          time:       fmtTime(res.time),
-          specialist: res.specialist || "—",
-          payment:    res.payment === "efectivo" ? "💵 Efectivo" : "📱 Nequi / Daviplata",
-          admin_url:  `${window.location.origin}/admin.html`,
-        });
-        console.log("✅ Email admin enviado");
-      } catch(e) {
-        console.warn("EmailJS error:", e);
-      }
-    }
-
     // ── Auth ──────────────────────────────────────────────────────────────────
     onAuthStateChanged(auth, user => {
       if (user && user.email === AUTHORIZED_EMAIL) {
@@ -532,12 +488,6 @@
           playNotifSound(); // 🎵 Melodía suave de spa
           showToast(`🔔 ${diff} nueva${diff > 1 ? "s" : ""} cita${diff > 1 ? "s" : ""} pendiente${diff > 1 ? "s" : ""}!`);
           document.title = `(${pendienteCount}) Admin · WSN`;
-
-          // Email al admin por cada nueva cita
-          const newOnes = allRes
-            .filter(r => r.status === "pendiente" && (!dateFilter || r.date === dateFilter))
-            .slice(-diff);
-          newOnes.forEach(r => notifyAdminByEmail(r));
 
           const badge   = document.getElementById("new-reservations-badge");
           const countEl = document.getElementById("new-count");

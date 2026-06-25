@@ -26,11 +26,11 @@ export const NOTIFY_CONFIG = {
 
     serviceId:        "service_rgenrgj",          // EmailJS > Email Services
 
-    adminTemplateId:  "wsn_admin_nueva_cita",   // nombre que pondrás al template
+    adminTemplateId:  "template_pmw2ukf",
 
-    clientTemplateId: "wsn_cliente_confirmada", // nombre que pondrás al template
+    clientTemplateId: "template_pmw2ukf",
 
-    applicationTemplateId: "wsn_admin_postulacion",
+    applicationTemplateId: "template_pmw2ukf",
 
   },
 
@@ -127,6 +127,19 @@ export async function notifyAdminEmail(data) {
       {
 
         to_email:   NOTIFY_CONFIG.business.adminEmail,
+        email:      NOTIFY_CONFIG.business.adminEmail,
+
+        subject:    `Nueva cita: ${data.service}`,
+
+        title:      "Nueva cita pendiente",
+
+        intro:      "Una clienta acaba de solicitar una reserva en Women Secret Nails.",
+
+        details:    `Cliente: ${data.clientName}\nTeléfono: ${data.phone}\nServicio: ${data.service}\nFecha: ${data.date}\nHora: ${data.time}\nEspecialista: ${data.specialist}\nPago: ${data.payment === "efectivo" ? "Efectivo" : "Nequi / Daviplata"}`,
+
+        cta_url:    `${window.location.origin}/admin.html`,
+
+        cta_text:   "Abrir panel admin",
 
         service:    data.service,
 
@@ -185,6 +198,19 @@ export async function notifyClientEmail(data) {
       {
 
         to_email:    data.clientEmail,
+        email:       data.clientEmail,
+
+        subject:     "Tu cita fue confirmada",
+
+        title:       "Tu cita está confirmada",
+
+        intro:       `Hola ${data.clientName}, tu cita en ${NOTIFY_CONFIG.business.name} fue confirmada.`,
+
+        details:     `Servicio: ${data.service}\nFecha: ${data.date}\nHora: ${data.time}\nEspecialista: ${data.specialist}`,
+
+        cta_url:     `${window.location.origin}/profile.html`,
+
+        cta_text:    "Ver mis citas",
 
         clientName:  data.clientName,
 
@@ -237,8 +263,22 @@ export async function notifyApplicationEmail(data) {
       {
 
         to_email:   NOTIFY_CONFIG.business.adminEmail,
+        email:      NOTIFY_CONFIG.business.adminEmail,
+
+        subject:    `Nueva postulación: ${data.name}`,
+
+        title:      "Nueva postulación recibida",
+
+        intro:      "Alguien acaba de enviar el formulario de Trabaja con nosotras.",
+
+        details:    `Nombre: ${data.name}\nTeléfono: ${data.phone}\nÁrea: ${data.role}\nExperiencia: ${data.experience}\nMensaje: ${data.message}`,
+
+        cta_url:    `${window.location.origin}/careers.html`,
+
+        cta_text:   "Ver página de postulaciones",
 
         name:       data.name,
+        clientName: data.name,
 
         phone:      data.phone,
 
