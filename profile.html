@@ -181,6 +181,7 @@
         <a href="services.html">Servicios</a>
         <!-- FIX: "Trabaja con nosotras" con link correcto -->
         <a href="careers.html">Trabaja con nosotras</a>
+        <a href="admin.html" id="admin-nav-link" style="display:none;">Admin</a>
         <span class="nav-current">Mi perfil</span>
         <button id="btn-signout" class="nav-cta" style="cursor:pointer;border:none;">Salir</button>
       </nav>
@@ -320,6 +321,7 @@
     const db      = getFirestore(app);
     const auth    = getAuth(app);
     const isGuest = sessionStorage.getItem("wsn-guest") === "true";
+    const ADMIN_EMAIL = "tatismahecha01@gmail.com";
 
     const loadEl    = document.getElementById("profile-loading");
     const contentEl = document.getElementById("profile-content");
@@ -344,6 +346,8 @@
         window.location.href = "login.html"; return;
       }
       if (user) {
+        const adminLink = document.getElementById("admin-nav-link");
+        if (adminLink && user.email?.toLowerCase() === ADMIN_EMAIL) adminLink.style.display = "";
         contentEl.style.display = "block";
         renderHero(user);
         await loadCitas(user.uid);

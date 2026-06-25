@@ -11,6 +11,7 @@
   <style>
     /* ── Avatar del cliente en el header ── */
     .client-nav { display:flex; align-items:center; gap:12px; }
+    #client-nav-slot { display:flex; align-items:center; gap:10px; }
     .client-avatar {
       width:34px; height:34px; border-radius:50%;
       background:var(--rose-pale); border:2px solid var(--rose-soft);
@@ -27,6 +28,103 @@
     .guest-nav-badge { font-size:11px; color:var(--text-light); letter-spacing:0.04em; }
     .guest-nav-badge a { color:var(--rose-deep); font-weight:500; text-decoration:none; }
     .guest-nav-badge a:hover { text-decoration:underline; }
+
+    .admin-nav-link {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--rose-deep);
+      border: 1px solid rgba(201,123,138,0.28);
+      background: var(--rose-pale);
+      border-radius: var(--radius-xl);
+      padding: 8px 14px;
+      font-weight: 500;
+    }
+
+    .date-picker-wrap { position: relative; }
+    .date-trigger {
+      width: 100%;
+      border: 1px solid rgba(212,184,150,0.35);
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #fff, var(--nude-pale));
+      color: var(--text-dark);
+      font-family: var(--font-body);
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(44,31,34,0.06);
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+    }
+    .date-trigger:hover,
+    .date-trigger:focus-visible {
+      border-color: var(--rose);
+      box-shadow: 0 10px 28px rgba(201,123,138,0.14);
+      transform: translateY(-1px);
+      outline: none;
+    }
+    .date-trigger-main { display: flex; align-items: center; gap: 12px; text-align: left; }
+    .date-trigger-icon {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--rose-pale); color: var(--rose-deep);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .date-trigger-label { display: block; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-light); margin-bottom: 2px; }
+    .date-trigger-value { display: block; font-family: var(--font-display); font-size: 22px; color: var(--text-dark); }
+    .date-trigger-chevron { color: var(--rose-deep); font-size: 18px; }
+    .native-date-input {
+      position: absolute;
+      width: 1px; height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .calendar-popover {
+      position: absolute;
+      inset: calc(100% + 10px) 0 auto 0;
+      background: #fff;
+      border: 1px solid rgba(212,184,150,0.24);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-modal);
+      z-index: 20;
+      display: none;
+    }
+    .calendar-popover.open { display: block; animation: fadeUp 0.2s forwards; }
+    .calendar-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .calendar-title { font-family: var(--font-display); font-size: 22px; color: var(--text-dark); text-transform: capitalize; }
+    .calendar-head button {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid rgba(212,184,150,0.35);
+      background: var(--nude-pale); color: var(--rose-deep);
+      cursor: pointer; font-size: 18px;
+    }
+    .calendar-weekdays,
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+    .calendar-weekdays span {
+      text-align: center; font-size: 10px; letter-spacing: 0.08em;
+      color: var(--text-light); text-transform: uppercase; padding: 4px 0;
+    }
+    .calendar-day {
+      aspect-ratio: 1;
+      border: 1px solid transparent;
+      background: var(--nude-pale);
+      border-radius: var(--radius-sm);
+      color: var(--text-dark);
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: background var(--transition), border-color var(--transition), transform var(--transition);
+    }
+    .calendar-day:hover:not(:disabled) { background: var(--rose-pale); border-color: var(--rose); transform: translateY(-1px); }
+    .calendar-day.selected { background: var(--rose-deep); color: white; border-color: var(--rose-deep); }
+    .calendar-day:disabled { opacity: 0.32; cursor: not-allowed; }
+    .calendar-day.empty { visibility: hidden; }
 
     /* ── Panel Nequi/Daviplata ── */
     .nequi-panel {
@@ -49,7 +147,7 @@
       font-family: var(--font-display); font-size: 24px;
       font-weight: 600; color: #2e7d32; letter-spacing: 0.04em;
     }
-    .nequi-copy {
+    .nequi-copy, .wallet-open {
       padding: 8px 16px; background: #388e3c; color: white;
       border: none; border-radius: var(--radius-xl);
       font-family: var(--font-body); font-size: 12px; font-weight: 500;
@@ -57,6 +155,19 @@
       white-space: nowrap; flex-shrink: 0;
     }
     .nequi-copy:hover { background: #2e7d32; transform: translateY(-1px); }
+    .wallet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .wallet-open {
+      width: 100%;
+      background: white;
+      color: #2e7d32;
+      border: 1px solid #a5d6a7;
+      padding: 11px 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .wallet-open:hover { background: #f7fff8; transform: translateY(-1px); }
     .nequi-hint { font-size: 12px; color: #388e3c; line-height: 1.6; font-weight: 300; margin-top: 4px; }
     .nequi-name { font-size: 12px; color: #388e3c; font-weight: 500; margin-top: 6px; }
 
@@ -78,6 +189,7 @@
     @media(max-width:480px) {
       .nequi-header { flex-wrap: wrap; }
       .nequi-copy { width: 100%; text-align: center; margin-top: 8px; }
+      .wallet-actions { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -145,7 +257,30 @@
         <h3 class="step-title">¿Cuándo quieres venir?</h3>
         <div class="form-group">
           <label class="form-label" for="reservation-date">Fecha</label>
-          <input type="date" id="reservation-date" class="form-input">
+          <div class="date-picker-wrap">
+            <button type="button" class="date-trigger" id="date-trigger" aria-haspopup="dialog" aria-expanded="false">
+              <span class="date-trigger-main">
+                <span class="date-trigger-icon">📅</span>
+                <span>
+                  <span class="date-trigger-label">Toca para elegir</span>
+                  <span class="date-trigger-value" id="date-trigger-value">Seleccionar fecha</span>
+                </span>
+              </span>
+              <span class="date-trigger-chevron">⌄</span>
+            </button>
+            <input type="date" id="reservation-date" class="native-date-input" tabindex="-1">
+            <div class="calendar-popover" id="calendar-popover" role="dialog" aria-label="Seleccionar fecha">
+              <div class="calendar-head">
+                <button type="button" id="calendar-prev" aria-label="Mes anterior">‹</button>
+                <div class="calendar-title" id="calendar-title"></div>
+                <button type="button" id="calendar-next" aria-label="Mes siguiente">›</button>
+              </div>
+              <div class="calendar-weekdays">
+                <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+              </div>
+              <div class="calendar-grid" id="calendar-grid"></div>
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">Hora disponible</label>
@@ -215,8 +350,12 @@
             <button class="nequi-copy" id="nequi-copy-btn" type="button">Copiar número</button>
           </div>
           <p class="nequi-name">A nombre de: <strong>Women Secret Nails</strong></p>
+          <div class="wallet-actions">
+            <button type="button" class="wallet-open" id="open-nequi">Abrir Nequi</button>
+            <button type="button" class="wallet-open" id="open-daviplata">Abrir Daviplata</button>
+          </div>
           <p class="nequi-hint" style="margin-top:8px;">
-            💬 Después de reservar te llegará un botón para enviar el comprobante por WhatsApp.
+            En celular intentaremos abrir tu billetera. Si la app no permite prellenar el pago, usa el número 301 788 6217.
           </p>
         </div>
 

@@ -27,6 +27,8 @@ const BUSINESS = {
   closeHour: 20, closeMinute: 30,
   slotStep: 30,
 };
+const ADMIN_EMAIL = "tatismahecha01@gmail.com";
+const WALLET_PHONE = "3017886217";
 
 const EMOJIS = {
   "shampoo":"🧴","depilacion cejas":"✨","depilación cejas":"✨",
@@ -97,16 +99,20 @@ function renderNav(user) {
     sessionStorage.removeItem("wsn-guest");
     currentUser = user;
     const name = user.displayName || user.email.split("@")[0];
+    const isAdmin = user.email?.toLowerCase() === ADMIN_EMAIL;
     slot.innerHTML = `
-      <a href="profile.html"
-         style="display:flex;align-items:center;gap:8px;text-decoration:none;">
-        <span class="client-name-nav">${name}</span>
-        <div class="client-avatar">
-          ${user.photoURL
-            ? `<img src="${user.photoURL}" alt="${name}">`
-            : name.charAt(0).toUpperCase()}
-        </div>
-      </a>`;
+      <span class="client-nav">
+        ${isAdmin ? `<a href="admin.html" class="admin-nav-link">Admin</a>` : ""}
+        <a href="profile.html"
+           style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+          <span class="client-name-nav">${name}</span>
+          <div class="client-avatar">
+            ${user.photoURL
+              ? `<img src="${user.photoURL}" alt="${name}">`
+              : name.charAt(0).toUpperCase()}
+          </div>
+        </a>
+      </span>`;
   } else {
     // Sin sesión: puede ser invitada o anónima
     const isGuest = sessionStorage.getItem("wsn-guest") === "true";
@@ -155,6 +161,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const stepOk   = document.getElementById("step-success");
 
   const dateInput    = document.getElementById("reservation-date");
+  const dateTrigger  = document.getElementById("date-trigger");
+  const dateValue    = document.getElementById("date-trigger-value");
+  const calendarPop  = document.getElementById("calendar-popover");
+  const calendarGrid = document.getElementById("calendar-grid");
+  const calendarTitle = document.getElementById("calendar-title");
+  const calendarPrev = document.getElementById("calendar-prev");
+  const calendarNext = document.getElementById("calendar-next");
   const timeSlotsEl  = document.getElementById("time-slots");
   const staffListEl  = document.getElementById("staff-list");
   const nameInput    = document.getElementById("client-name");
@@ -163,6 +176,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeOk      = document.getElementById("close-success");
   const nequiPanel   = document.getElementById("nequi-panel");
   const nequiCopyBtn = document.getElementById("nequi-copy-btn");
+  const openNequiBtn = document.getElementById("open-nequi");
+  const openDaviplataBtn = document.getElementById("open-daviplata");
 
   const sumService    = document.getElementById("summary-service");
   const sumSpecialist = document.getElementById("summary-specialist");
@@ -175,6 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fecha mínima = hoy
   const now = new Date();
   dateInput.min = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  let calendarMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
   // ── Panel Nequi ──────────────────────────────────────────────────────────
   document.querySelectorAll("input[name='payment']").forEach(radio => {
@@ -185,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   nequiCopyBtn?.addEventListener("click", () => {
-    navigator.clipboard.writeText("3017886217").then(() => {
+    navigator.clipboard.writeText(WALLET_PHONE).then(() => {
       nequiCopyBtn.textContent = "¡Copiado! ✓";
       nequiCopyBtn.style.background = "#4caf50";
       setTimeout(() => {
@@ -193,6 +209,111 @@ document.addEventListener("DOMContentLoaded", () => {
         nequiCopyBtn.style.background = "";
       }, 2500);
     });
+  });
+
+  function openWallet(appName) {
+    const amount = parseInt(String(bk.servicePrice || "").replace(/\D/g, ""), 10);
+    const note = encodeURIComponent(`Women Secret Nails - ${bk.serviceName || "Reserva"}`);
+    const urls = appName === "nequi"
+      ? [
+          `nequi://send?phone=${WALLET_PHONE}${amount ? `&amount=${amount}` : ""}&description=${note}`,
+          "nequi://app"
+        ]
+      : [
+          `daviplata://send?phone=${WALLET_PHONE}${amount ? `&amount=${amount}` : ""}&description=${note}`,
+          "daviplata://app"
+        ];
+
+    window.location.href = urls[0];
+    setTimeout(() => {
+      if (document.hidden) return;
+      window.location.href = urls[1];
+      showToast(`Si ${appName === "nequi" ? "Nequi" : "Daviplata"} no se abre, paga al ${WALLET_PHONE}.`);
+    }, 900);
+  }
+
+  openNequiBtn?.addEventListener("click", () => openWallet("nequi"));
+  openDaviplataBtn?.addEventListener("click", () => openWallet("daviplata"));
+
+  function dateToValue(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  }
+
+  function valueToDate(value) {
+    const [year, month, day] = value.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  function setReservationDate(value) {
+    dateInput.value = value;
+    bk.date = value;
+    bk.time = null;
+    dateValue.textContent = fmtDate(value);
+    calendarPop?.classList.remove("open");
+    dateTrigger?.setAttribute("aria-expanded", "false");
+    subscribeSlots(value);
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    if (!calendarGrid || !calendarTitle) return;
+    calendarTitle.textContent = calendarMonth.toLocaleDateString("es-CO", {
+      month: "long",
+      year: "numeric",
+    });
+    calendarGrid.innerHTML = "";
+
+    const minDate = valueToDate(dateInput.min);
+    minDate.setHours(0, 0, 0, 0);
+    const first = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1);
+    const leading = (first.getDay() + 6) % 7;
+    const days = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 0).getDate();
+
+    for (let i = 0; i < leading; i++) {
+      const empty = document.createElement("button");
+      empty.type = "button";
+      empty.className = "calendar-day empty";
+      empty.disabled = true;
+      calendarGrid.appendChild(empty);
+    }
+
+    for (let day = 1; day <= days; day++) {
+      const current = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day);
+      current.setHours(0, 0, 0, 0);
+      const value = dateToValue(current);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "calendar-day";
+      btn.textContent = day;
+      btn.disabled = current < minDate;
+      if (value === dateInput.value) btn.classList.add("selected");
+      btn.addEventListener("click", () => setReservationDate(value));
+      calendarGrid.appendChild(btn);
+    }
+  }
+
+  dateTrigger?.addEventListener("click", () => {
+    const open = !calendarPop?.classList.contains("open");
+    calendarPop?.classList.toggle("open", open);
+    dateTrigger.setAttribute("aria-expanded", String(open));
+    renderCalendar();
+  });
+
+  document.addEventListener("click", e => {
+    if (!calendarPop?.classList.contains("open")) return;
+    if (e.target.closest(".date-picker-wrap")) return;
+    calendarPop.classList.remove("open");
+    dateTrigger?.setAttribute("aria-expanded", "false");
+  });
+
+  calendarPrev?.addEventListener("click", () => {
+    calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
+    renderCalendar();
+  });
+
+  calendarNext?.addEventListener("click", () => {
+    calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
+    renderCalendar();
   });
 
   // ── Servicios en tiempo real ─────────────────────────────────────────────
@@ -331,6 +452,11 @@ document.addEventListener("DOMContentLoaded", () => {
     modalTitle.textContent = name;
     modalMeta.textContent  = `${fmtPrice(price)} · ~${duration} min`;
     dateInput.value        = "";
+    dateValue.textContent   = "Seleccionar fecha";
+    calendarMonth           = new Date(now.getFullYear(), now.getMonth(), 1);
+    calendarPop?.classList.remove("open");
+    dateTrigger?.setAttribute("aria-expanded", "false");
+    renderCalendar();
     timeSlotsEl.innerHTML  = `<p class="slots-hint">Selecciona una fecha para ver los horarios.</p>`;
     if (unsubSlots) { unsubSlots(); unsubSlots = null; }
     if (nequiPanel) nequiPanel.style.display = "none";
@@ -361,9 +487,7 @@ document.addEventListener("DOMContentLoaded", () => {
   dateInput?.addEventListener("change", () => {
     const date = dateInput.value;
     if (!date) return;
-    bk.date = date;
-    bk.time = null;
-    subscribeSlots(date);
+    setReservationDate(date);
   });
 
   timeSlotsEl?.addEventListener("click", e => {

@@ -372,6 +372,7 @@
     const db   = getFirestore(app);
     const auth = getAuth(app);
     const isGuest = sessionStorage.getItem("wsn-guest") === "true";
+    const ADMIN_EMAIL = "tatismahecha01@gmail.com";
 
     // Nav auth
     onAuthStateChanged(auth, user => {
@@ -379,7 +380,10 @@
       if (!slot) return;
       if (user) {
         const name = user.displayName || user.email.split("@")[0];
-        slot.innerHTML = `<a href="profile.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+        const adminLink = user.email?.toLowerCase() === ADMIN_EMAIL
+          ? `<a href="admin.html" class="nav-cta" style="margin-right:8px;">Admin</a>`
+          : "";
+        slot.innerHTML = `${adminLink}<a href="profile.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
           <span style="font-size:13px;color:var(--text-mid);">${name}</span>
           <div style="width:32px;height:32px;border-radius:50%;background:var(--rose-pale);border:2px solid var(--rose-soft);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--rose-deep);">
             ${user.photoURL ? `<img src="${user.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : name.charAt(0).toUpperCase()}
