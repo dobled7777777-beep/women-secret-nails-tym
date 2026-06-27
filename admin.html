@@ -363,8 +363,6 @@
     import { getAuth, signInWithEmailAndPassword, signInWithPopup,
              GoogleAuthProvider, signOut, onAuthStateChanged }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-    import { notifyClientEmail } from "./js/notifications.js";
-
     const firebaseConfig = {
       apiKey:            "AIzaSyDFsFLw518RovvIPGcIzFDrih4oKBKgz-o",
       authDomain:        "women-secret-nails.firebaseapp.com",
@@ -709,16 +707,6 @@
 
         if (newStatus === "confirmada") {
           const res = allRes.find(r => r.id === id);
-          if (res) {
-            notifyClientEmail({
-              clientEmail: res.userEmail,
-              clientName: res.clientName || res.client || "Clienta",
-              service: res.service,
-              date: fmtDate(res.date),
-              time: fmtTime(res.time),
-              specialist: res.specialist || "Women Secret Nails",
-            });
-          }
           if (res?.phone) {
             const phone = res.phone.replace(/\D/g,"");
             const tel   = phone.startsWith("57") ? phone : `57${phone}`;

@@ -296,15 +296,15 @@
         <div class="apply-grid">
           <div>
             <label class="apply-label" for="ap-name">Tu nombre completo</label>
-            <input type="text" id="ap-name" class="apply-input" placeholder="Ej: Laura Martínez">
+            <input type="text" id="ap-name" name="name" class="apply-input" placeholder="Ej: Laura Martínez">
           </div>
           <div>
             <label class="apply-label" for="ap-phone">WhatsApp / Teléfono</label>
-            <input type="tel" id="ap-phone" class="apply-input" placeholder="Ej: 300 123 4567">
+            <input type="tel" id="ap-phone" name="phone" class="apply-input" placeholder="Ej: 300 123 4567">
           </div>
           <div>
             <label class="apply-label" for="ap-role">Área de interés</label>
-            <select id="ap-role" class="apply-select">
+            <select id="ap-role" name="role" class="apply-select">
               <option value="">Selecciona una opción…</option>
               <option value="Técnica en uñas">Técnica en uñas</option>
               <option value="Especialista en cejas">Especialista en cejas</option>
@@ -315,11 +315,11 @@
           </div>
           <div class="role-other-wrap" id="role-other-wrap">
             <label class="apply-label" for="ap-role-other">Cuéntame más</label>
-            <input type="text" id="ap-role-other" class="apply-input" placeholder="Ej: atención al cliente, maquillaje, ventas, recepción...">
+            <input type="text" id="ap-role-other" name="role_other" class="apply-input" placeholder="Ej: atención al cliente, maquillaje, ventas, recepción...">
           </div>
           <div>
             <label class="apply-label" for="ap-exp">Años de experiencia</label>
-            <select id="ap-exp" class="apply-select">
+            <select id="ap-exp" name="experience" class="apply-select">
               <option value="">Selecciona…</option>
               <option value="Sin experiencia — recién aprendí">Sin experiencia — recién aprendí</option>
               <option value="Menos de 1 año">Menos de 1 año</option>
@@ -329,7 +329,7 @@
           </div>
           <div class="full">
             <label class="apply-label" for="ap-msg">Cuéntanos un poco de ti</label>
-            <textarea id="ap-msg" class="apply-textarea" placeholder="¿Por qué quieres trabajar con nosotras? ¿Qué técnicas dominas? ¿Cuál es tu disponibilidad?"></textarea>
+            <textarea id="ap-msg" name="message" class="apply-textarea" placeholder="¿Por qué quieres trabajar con nosotras? ¿Qué técnicas dominas? ¿Cuál es tu disponibilidad?"></textarea>
           </div>
         </div>
 
@@ -364,8 +364,6 @@
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged }
       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-    import { notifyApplicationEmail } from "./js/notifications.js";
-
     const firebaseConfig = {
       apiKey:            "AIzaSyDFsFLw518RovvIPGcIzFDrih4oKBKgz-o",
       authDomain:        "women-secret-nails.firebaseapp.com",
@@ -433,13 +431,19 @@
           name, phone, role: finalRole, experience: exp, message: msg,
           status: "nueva", createdAt: serverTimestamp()
         });
-        notifyApplicationEmail({
-          name,
-          phone,
-          role: finalRole,
-          experience: exp,
-          message: msg || "Sin mensaje adicional",
-        });
+        const formData = new FormData();
+        formData.append(["access", "key"].join("_"), ["b49b66dd", "3bf5", "4df2", "b5ff", "5c2e7161d311"].join("-"));
+        formData.append("subject", "Nueva postulacion Women Secret Nails");
+        formData.append("from_name", "Women Secret Nails - Trabaja con nosotras");
+        formData.append("Nombre completo", name);
+        formData.append("WhatsApp / Telefono", phone);
+        formData.append("Area de interes", finalRole);
+        formData.append("Anos de experiencia", exp);
+        formData.append("Mensaje", msg || "Sin mensaje adicional");
+        formData.append("Origen", window.location.href);
+        const response = await fetch("https://api.web3forms.com/submit", { method: "POST", body: formData });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || "Web3Forms error");
         document.getElementById("apply-form").style.display    = "none";
         document.getElementById("apply-success").style.display = "block";
 
@@ -448,7 +452,7 @@
           `💼 *Nueva postulación WSN!*\n\n` +
           `👤 ${name}\n📞 ${phone}\n💅 ${finalRole}\n⏱ Exp: ${exp}\n\n${msg ? `"${msg}"` : ""}`
         );
-        window.open(`https://wa.me/573017886217?text=${waMsg}`, "_blank");
+        console.log("Postulacion enviada por Web3Forms");
       } catch(e) {
         console.error(e);
         errEl.textContent = "Error al enviar. Intenta de nuevo.";

@@ -15,6 +15,7 @@ import { getAuth, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 import {
   notifyAdminEmail,
+  notifyClientEmail,
   notifyAdminWhatsApp,
   buildComprobanteWhatsAppUrl,
 } from "./notifications.js";
@@ -626,12 +627,14 @@ document.addEventListener("DOMContentLoaded", () => {
         service:    bk.serviceName,
         clientName: bk.clientName,
         phone:      bk.clientPhone,
+        clientEmail: currentUser?.email || "",
         date:       fmtDate(bk.date),
         time:       fmtTime(bk.time),
         specialist: bk.specialist,
         payment:    bk.payment,
       };
       notifyAdminEmail(notifData);
+      notifyClientEmail(notifData);
       notifyAdminWhatsApp(notifData);
 
       // Pasar al paso de éxito

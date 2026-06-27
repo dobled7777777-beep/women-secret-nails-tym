@@ -26,11 +26,10 @@ export const NOTIFY_CONFIG = {
 
     serviceId:        "service_rgenrgj",          // EmailJS > Email Services
 
-    adminTemplateId:  "template_pmw2ukf",
+    adminTemplateId:  "template_7i56jda",
 
     clientTemplateId: "template_pmw2ukf",
 
-    applicationTemplateId: "template_pmw2ukf",
 
   },
 
@@ -147,6 +146,8 @@ export async function notifyAdminEmail(data) {
 
         phone:      data.phone,
 
+        clientEmail: data.clientEmail || data.userEmail || "No registrado",
+
         date:       data.date,
 
         time:       data.time,
@@ -200,17 +201,17 @@ export async function notifyClientEmail(data) {
         to_email:    data.clientEmail,
         email:       data.clientEmail,
 
-        subject:     "Tu cita fue confirmada",
+        subject:     "Queremos conocer tu experiencia en Women Secret Nails",
 
         title:       "Tu cita está confirmada",
 
-        intro:       `Hola ${data.clientName}, tu cita en ${NOTIFY_CONFIG.business.name} fue confirmada.`,
+        intro:       `Hola ${data.clientName}, gracias por elegir ${NOTIFY_CONFIG.business.name}. Nos encantaria conocer tu opinion.`,
 
         details:     `Servicio: ${data.service}\nFecha: ${data.date}\nHora: ${data.time}\nEspecialista: ${data.specialist}`,
 
-        cta_url:     `${window.location.origin}/profile.html`,
+        cta_url:     "https://docs.google.com/forms/d/e/1FAIpQLSfHCqwUrb1ik8uQ6HH4k-hV5m38TKvM-jYf_cuh8bn2d2ZySA/viewform?usp=header",
 
-        cta_text:    "Ver mis citas",
+        cta_text:    "Responder encuesta",
 
         clientName:  data.clientName,
 
@@ -239,74 +240,6 @@ export async function notifyClientEmail(data) {
 }
 
 
-
-// ── 3. Email al ADMIN cuando llega una postulación ───────────────────────────
-
-export async function notifyApplicationEmail(data) {
-
-  // data: { name, phone, role, experience, message }
-
-  await loadEmailJS();
-
-  if (!window.emailjs) return;
-
-  if (NOTIFY_CONFIG.emailjs.publicKey === "TU_PUBLIC_KEY") return;
-
-  try {
-
-    await window.emailjs.send(
-
-      NOTIFY_CONFIG.emailjs.serviceId,
-
-      NOTIFY_CONFIG.emailjs.applicationTemplateId,
-
-      {
-
-        to_email:   NOTIFY_CONFIG.business.adminEmail,
-        email:      NOTIFY_CONFIG.business.adminEmail,
-
-        subject:    `Nueva postulación: ${data.name}`,
-
-        title:      "Nueva postulación recibida",
-
-        intro:      "Alguien acaba de enviar el formulario de Trabaja con nosotras.",
-
-        details:    `Nombre: ${data.name}\nTeléfono: ${data.phone}\nÁrea: ${data.role}\nExperiencia: ${data.experience}\nMensaje: ${data.message}`,
-
-        cta_url:    `${window.location.origin}/careers.html`,
-
-        cta_text:   "Ver página de postulaciones",
-
-        name:       data.name,
-        clientName: data.name,
-
-        phone:      data.phone,
-
-        role:       data.role,
-
-        experience: data.experience,
-
-        message:    data.message,
-
-        admin_url:  `${window.location.origin}/admin.html`,
-
-      }
-
-    );
-
-    console.log("✅ Email postulación enviado");
-
-  } catch(e) {
-
-    console.warn("EmailJS postulación error:", e);
-
-  }
-
-}
-
-
-
-// ── 3. WhatsApp automático al ADMIN via CallMeBot ────────────────────────────
 
 export async function notifyAdminWhatsApp(data) {
 
