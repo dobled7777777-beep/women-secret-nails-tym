@@ -1,4 +1,4 @@
-// =====================================================
+﻿// =====================================================
 
 // js/notifications.js — Sistema de notificaciones WSN
 
@@ -200,12 +200,14 @@ export async function notifyClientEmail(data) {
 
         to_email:    data.clientEmail,
         email:       data.clientEmail,
+        from_name:   NOTIFY_CONFIG.business.name,
+        reply_to:    NOTIFY_CONFIG.business.adminEmail,
 
-        subject:     "Queremos conocer tu experiencia en Women Secret Nails",
+        subject:     "Women Secret Nails - gracias por elegirnos",
 
         title:       "Tu cita está confirmada",
 
-        intro:       `Hola ${data.clientName}, gracias por elegir ${NOTIFY_CONFIG.business.name}. Nos encantaria conocer tu opinion.`,
+        intro:       `Hola ${data.clientName}, gracias por elegir ${NOTIFY_CONFIG.business.name}. Tu opinion nos ayuda a mejorar cada detalle de tu experiencia.`,
 
         details:     `Servicio: ${data.service}\nFecha: ${data.date}\nHora: ${data.time}\nEspecialista: ${data.specialist}`,
 
@@ -349,5 +351,5 @@ export function buildComprobanteWhatsAppUrl(data) {
 
   return `https://wa.me/${NOTIFY_CONFIG.business.phone}?text=${msg}`;
 
-} 
+}
 
